@@ -1,0 +1,73 @@
+@import "tailwindcss";
+
+/* ------------------------------------------------------------------
+   La Frontera — Design Tokens
+   Tailwind v4 usa configuración "CSS-first": todo vive aquí en @theme
+   en vez de tailwind.config.js. Cada variable genera automáticamente
+   utilidades (ej. --color-cactus -> bg-cactus, text-cactus, border-cactus).
+------------------------------------------------------------------- */
+@theme {
+  /* Paleta */
+  --color-cactus: #1e6f4f;
+  --color-cactus-dark: #164f38;
+  --color-cactus-light: #e6f0ea;
+  --color-arena: #f7f4ed;
+  --color-carbon: #151515;
+  --color-terracota: #c66a3d;
+  --color-terracota-light: #f5e2d6;
+  --color-frontera: #5e8da8;
+  --color-frontera-light: #e6edf1;
+  --color-white: #ffffff;
+
+  /* Tipografía */
+  --font-display: "General Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  /* Radios generosos, look cálido/minimalista */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.875rem;
+  --radius-lg: 1.25rem;
+  --radius-xl: 1.75rem;
+  --radius-2xl: 2.25rem;
+
+  /* Sombras suaves */
+  --shadow-soft: 0 2px 10px rgba(21, 21, 21, 0.06);
+  --shadow-card: 0 8px 24px rgba(21, 21, 21, 0.08);
+  --shadow-hover: 0 14px 32px rgba(21, 21, 21, 0.12);
+}
+
+@layer base {
+  html {
+    font-family: var(--font-body);
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-frontera);
+    outline-offset: 2px;
+  }
+}
+
+@layer utilities {
+  .container-frontera {
+    @apply mx-auto w-full max-w-7xl px-5 sm:px-8;
+  }
+  .shadow-card {
+    box-shadow: var(--shadow-card);
+  }
+  .shadow-hover {
+    box-shadow: var(--shadow-hover);
+  }
+}
+
+/* Respeta preferencia de movimiento reducido (WCAG) */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
