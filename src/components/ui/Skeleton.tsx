@@ -22,6 +22,20 @@ export function BusinessCardSkeleton() {
   );
 }
 
+/** Skeleton específico para MarketplaceCard, mismas proporciones que la tarjeta real. */
+export function MarketplaceCardSkeleton() {
+  return (
+    <div className="flex w-full flex-col gap-3">
+      <Skeleton className="aspect-[4/3] w-full rounded-xl" />
+      <div className="flex flex-col gap-2">
+        <Skeleton className="h-4 w-3/4" />
+        <Skeleton className="h-3.5 w-1/3" />
+        <Skeleton className="h-5 w-24 rounded-full" />
+      </div>
+    </div>
+  );
+}
+
 export function ActivityCardSkeleton() {
   return (
     <div className="flex flex-col gap-3 rounded-2xl border border-carbon/8 bg-white p-4">
