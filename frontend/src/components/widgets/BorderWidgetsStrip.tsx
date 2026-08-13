@@ -40,7 +40,6 @@ export function BorderWidgetsStrip() {
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-2.5">
             <span className="h-2 w-2 rounded-full bg-amber" />
-            <Eyebrow className="text-white/50">En vivo · Frontera</Eyebrow>
           </div>
           <span className="font-mono text-xs text-white/40">actualizado hace 5 min</span>
         </div>

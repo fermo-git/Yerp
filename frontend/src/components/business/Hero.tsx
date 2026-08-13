@@ -24,7 +24,6 @@ export function Hero() {
         >
        
 
-          <Eyebrow>Descubre la frontera · 10 ciudades</Eyebrow>
 
           <h1 className="mt-5 max-w-3xl font-display text-[2.9rem] font-extrabold leading-[1.02] tracking-[-0.02em] text-ink sm:text-6xl lg:text-7xl">
             ¿A dónde vas en la{" "}
