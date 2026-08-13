@@ -1,0 +1,16 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: lafrontera-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: lafrontera
+      POSTGRES_PASSWORD: lafrontera
+      POSTGRES_DB: lafrontera
+    ports:
+      - "5433:5432"
+    volumes:
+      - lafrontera_pgdata:/var/lib/postgresql/data
+
+volumes:
+  lafrontera_pgdata:

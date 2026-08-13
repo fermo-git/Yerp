@@ -1,94 +1,119 @@
-# La Frontera — Arquitectura General
+# La Frontera
 
-Ecosistema digital regional para ciudades fronterizas de México: negocios, turismo,
-eventos y marketplace local. Este documento cubre la arquitectura completa
-(frontend + backend) como contrato de referencia. El código de esta iteración
-implementa **solo el frontend**; el backend se deja especificado para
-implementarse después contra el mismo contrato (schema + endpoints).
+Ecosistema digital para ciudades fronterizas de México: negocios, turismo, garitas y marketplace local.
 
-## 1. Estructura de carpetas (monorepo lógico)
+**Stack:** React 19 + Vite (frontend) · Express + Prisma (backend) · PostgreSQL (Docker).
+
+## Requisitos
+
+- **Node.js 18+** (recomendado 20/22)
+- **npm** (o pnpm/yarn)
+- **Docker** + Docker Compose (para la base de datos)
+- Git
+
+## Estructura
 
 ```
 la-frontera/
-├── frontend/                      # React 19 + Vite (esta entrega)
-│   ├── public/
-│   │   └── fonts/                 # General Sans / Inter (self-hosted, ver index.html)
-│   ├── src/
-│   │   ├── assets/                # imágenes estáticas, ilustraciones de estados vacíos
-│   │   ├── components/
-│   │   │   ├── layout/            # Navbar, Footer, MainLayout
-│   │   │   ├── ui/                 # Button, Card, Badge, Skeleton, Input, Rating (design system)
-│   │   │   ├── business/          # BusinessCard, BusinessGrid, CategoryPill
-│   │   │   └── widgets/           # ExchangeRateWidget, BorderWaitWidget, WeatherWidget, GasPriceWidget
-│   │   ├── pages/                 # LandingPage, ExplorePage, BusinessDetailPage, etc.
-│   │   ├── layouts/               # MainLayout (Navbar + Outlet + Footer)
-│   │   ├── hooks/                 # useBusinesses, useFeaturedBusinesses, useBorderWidgets...
-│   │   ├── services/
-│   │   │   ├── api/               # client.ts (axios/fetch base) + businesses.ts, users.ts...
-│   │   │   └── mocks/             # mock data tipada según Prisma schema (temporal)
-│   │   ├── lib/                   # queryClient.ts, router.tsx
-│   │   ├── types/                 # tipos compartidos (Business, Review, User, Category...)
-│   │   ├── utils/                 # cn.ts, formatCurrency.ts, formatDistance.ts
-│   │   ├── App.tsx
-│   │   ├── main.tsx
-│   │   └── index.css              # Tailwind v4 + design tokens (@theme)
-│   ├── index.html
-│   ├── vite.config.ts
-│   ├── tsconfig.json
-│   └── package.json
-│
-├── backend/                       # Node.js + Express (a implementar después)
-│   ├── src/
-│   │   ├── modules/               # Arquitectura modular por dominio (screaming architecture)
-│   │   │   ├── auth/              # controller, service, routes, validators (JWT + Google OAuth)
-│   │   │   ├── users/
-│   │   │   ├── businesses/
-│   │   │   ├── reviews/
-│   │   │   ├── marketplace/
-│   │   │   ├── events/
-│   │   │   └── widgets/           # tipo de cambio, garitas, clima, gasolina (jobs + cache)
-│   │   ├── middlewares/           # auth.middleware, error.middleware, upload.middleware (Multer)
-│   │   ├── config/                # env.ts, cors.ts, googleMaps.ts
-│   │   ├── lib/                   # prisma client singleton
-│   │   ├── jobs/                  # cron: refrescar widgets de frontera cada N minutos
-│   │   ├── utils/
-│   │   └── app.ts / server.ts
-│   ├── prisma/
-│   │   ├── schema.prisma
-│   │   └── migrations/
-│   └── package.json
-│
-├── prisma/schema.prisma           # copia de referencia usada como contrato (ver /prisma)
-└── API_ENDPOINTS.md               # contrato REST usado para tipar los services del frontend
+├── frontend/          # React 19 + Vite (SPA)
+├── backend/           # Express + Prisma (auth)
+│   └── prisma/schema.prisma   # Contrato de datos (fuente de verdad)
+├── docker-compose.yml     # PostgreSQL
+└── .env / backend/.env    # Variables de entorno
 ```
 
-**Por qué esta separación:** cada módulo del backend es autocontenible
-(controller/service/routes/validators), lo que permite mapear 1:1 cada
-carpeta de `services/api` del frontend con un módulo del backend. El
-frontend nunca importa nada del backend directamente; solo consume el
-contrato REST documentado en `API_ENDPOINTS.md`.
+## Configuración paso a paso
 
-## 2. Decisiones clave de arquitectura frontend
+### 1. Clonar e instalar
 
-- **Ruteo por página, no por feature**: `pages/` contiene componentes de página;
-  `components/` contiene piezas reutilizables agrupadas por dominio visual.
-- **TanStack Query como única fuente de estado remoto**: no se usa Redux/Zustand
-  para datos de servidor. Estado de UI local (modales, filtros) vive en el
-  componente o en Context puntual si se comparte entre pocos componentes.
-- **Capa de servicios desacoplada**: `services/api/*.ts` expone funciones async
-  tipadas (`getFeaturedBusinesses()`, `getBusinessById(id)`...). Hoy leen de
-  `services/mocks`; mañana solo cambia el `fetch`/`axios` interno — los hooks
-  y componentes no se tocan.
-- **Tipos compartidos derivados del schema Prisma**: `types/` refleja los
-  modelos de `schema.prisma` para que, cuando el backend exista, los tipos de
-  respuesta de la API coincidan 1:1 con lo que el frontend ya espera.
+```bash
+git clone <url-del-repo>
+cd la-frontera
+```
 
-## 3. Stack confirmado
+### 2. Levantar la base de datos (Docker)
 
-| Capa | Tecnología |
+```bash
+docker compose up -d
+```
+
+Esto arranca PostgreSQL en el puerto `5433` (base/usuarios/contraseña: `lafrontera`).
+
+> Si ya tienes un PostgreSQL local en el puerto `5432`, no hay conflicto: usamos `5433`.
+
+### 3. Configurar el backend
+
+```bash
+cd backend
+cp .env.example .env        # luego edita JWT_SECRET
+npm install
+npm run prisma:generate     # genera el cliente Prisma
+npm run prisma:migrate -- --name init   # crea las tablas
+```
+
+### 4. Arrancar el backend
+
+```bash
+npm run dev                 # API en http://localhost:4000
+```
+
+### 5. Configurar y arrancar el frontend
+
+En otra terminal:
+
+```bash
+cd frontend
+npm ci                      # instala EXACTO desde package-lock.json
+npm run dev                 # Vite en http://localhost:5173
+```
+
+Opcional: copia `frontend/.env.example` a `frontend/.env` si quieres un `VITE_API_URL` distinto (por defecto apunta a `http://localhost:4000/api/v1`).
+
+### 6. Probar
+
+Abre http://localhost:5173 y usa **Crear cuenta** (Cuenta → Ciudad → Intereses → Listo) o **Iniciar sesión**.
+
+## Comandos útiles
+
+| Dónde | Comando | Qué hace |
+|---|---|---|
+| raíz | `docker compose up -d` | Levanta PostgreSQL |
+| raíz | `docker compose down` | Detiene PostgreSQL (los datos persisten en el volumen) |
+| `backend/` | `npm run dev` | API con recarga (nodemon) en `:4000` |
+| `backend/` | `npm run prisma:generate` | Regenera el cliente Prisma tras cambiar el schema |
+| `backend/` | `npm run prisma:migrate -- --name <nombre>` | Crea/aplica una migración |
+| `backend/` | `npm run prisma:studio` | Interfaz visual de Prisma |
+| `frontend/` | `npm run dev` | Dev server (Vite) en `:5173` |
+| `frontend/` | `npm run build` | TypeScript estricto + build de producción |
+
+## Variables de entorno
+
+### `backend/.env`
+
+| Variable | Descripción |
 |---|---|
-| Frontend | React 19, Vite, Tailwind CSS v4, Framer Motion, React Router, TanStack Query, React Hook Form + Zod |
-| Backend | Node.js, Express, PostgreSQL, Prisma ORM |
-| Auth | JWT (sesión propia) + Google OAuth (login social) |
-| Archivos | Multer (uploads locales/S3-compatible) |
-| Mapas | Google Maps API (geocoding + mapas de negocio) |
+| `DATABASE_URL` | Cadena de conexión a PostgreSQL (puerto `5433`) |
+| `JWT_SECRET` | Secreto para firmar los tokens. **Cada máquina debe usar el suyo** |
+| `JWT_EXPIRES_IN` | Duración del access token (ej. `7d`) |
+| `PORT` | Puerto del backend (default `4000`) |
+| `CORS_ORIGIN` | Origen permitido por CORS (default `http://localhost:5173`) |
+
+### `frontend/.env`
+
+| Variable | Descripción |
+|---|---|
+| `VITE_API_URL` | URL base de la API (default `http://localhost:4000/api/v1`) |
+
+## Notas
+
+- **Auth** usa la API real (`backend`). El resto de secciones (negocios, widgets) aún leen **mocks** tipados en el frontend.
+- El endpoint de **Google OAuth** es un stub (`501`) por ahora.
+- `npm run lint` en el frontend falla porque `eslint` no está declarado/instalado; no hay scripts de test ni formateo.
+- El schema vive en `backend/prisma/schema.prisma`; los scripts del backend ya apuntan a él (`npm run prisma:generate`, `prisma:migrate`).
+
+## Solución de problemas
+
+- **`docker compose` no se encuentra** → instala Docker Desktop y asegúrate de que esté corriendo.
+- **Error de conexión a la BD** → verifica `docker compose ps` y que `DATABASE_URL` use `localhost:5433`.
+- **`prisma migrate` no conecta** → confirma que la DB está arriba (`docker compose up -d`) antes de migrar.
+- **Puerto `4000` ocupado** → cambia `PORT` en `backend/.env` y `VITE_API_URL` en el frontend.
