@@ -5,6 +5,7 @@ import { cn } from "@/utils/cn";
 
 const NAV_LINKS = [
   { label: "Explorar", to: "/explorar" },
+  { label: "Restaurantes", to: "/restaurantes" },
   { label: "Eventos", to: "/eventos" },
   { label: "Marketplace", to: "/marketplace" },
   { label: "Publica tu negocio", to: "/negocios/nuevo" },

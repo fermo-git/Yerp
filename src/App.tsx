@@ -5,6 +5,7 @@ import { PlaceholderPage } from "@/pages/PlaceholderPage";
 
 import { MarketplacePage } from "@/pages/MarketplacePage";
 import { MarketplaceListingDetailPage } from "@/pages/MarketplaceListingDetailPage";
+import { RestaurantsPage } from "@/pages/RestaurantsPage";
 
 export default function App() {
   return (
@@ -15,6 +16,7 @@ export default function App() {
           <Route path="/explorar" element={<PlaceholderPage title="Explorar negocios" />} />
           <Route path="/eventos" element={<PlaceholderPage title="Eventos" />} />
           <Route path="/marketplace" element={<MarketplacePage />} />
+          <Route path="/restaurantes" element={<RestaurantsPage />} />
           <Route path="/marketplace/:slug" element={<MarketplaceListingDetailPage />} />
           <Route path="/negocios/nuevo" element={<PlaceholderPage title="Publica tu negocio" />} />
           <Route path="/negocios/:slug" element={<PlaceholderPage title="Detalle de negocio" />} />

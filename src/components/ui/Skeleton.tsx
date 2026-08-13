@@ -36,6 +36,20 @@ export function MarketplaceCardSkeleton() {
   );
 }
 
+/** Skeleton específico para RestaurantCard: imagen más grande (3 por fila). */
+export function RestaurantCardSkeleton() {
+  return (
+    <div className="flex w-full flex-col gap-3">
+      <Skeleton className="aspect-[16/11] w-full rounded-xl" />
+      <div className="flex flex-col gap-2">
+        <Skeleton className="h-4 w-3/4" />
+        <Skeleton className="h-3.5 w-1/2" />
+        <Skeleton className="h-3.5 w-2/5" />
+      </div>
+    </div>
+  );
+}
+
 export function ActivityCardSkeleton() {
   return (
     <div className="flex flex-col gap-3 rounded-2xl border border-carbon/8 bg-white p-4">
