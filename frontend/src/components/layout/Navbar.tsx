@@ -40,9 +40,9 @@ const NAV_LINKS = [
     ),
   },
   {
-    label: "Negocios",
-    to: "/negocios/nuevo",
-    icon: icon(<path d="M4 8h16v12H4zM9 8V5a3 3 0 0 1 6 0v3M4 13h16" />),
+    label: "Restaurantes",
+    to: "/restaurantes",
+    icon: icon(<path d="M5 3v8a2 2 0 0 0 2 2v8M9 3v6M5 3h4M19 3v18M19 3c-2 0-3 2-3 5s1 4 3 4" />),
   },
 ];
 

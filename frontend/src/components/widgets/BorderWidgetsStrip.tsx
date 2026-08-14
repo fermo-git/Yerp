@@ -1,6 +1,5 @@
 import { useBorderWidgets } from "@/hooks/useBusinesses";
 import { Skeleton } from "@/components/ui/Skeleton";
-import { Eyebrow } from "@/components/ui/Eyebrow";
 import { CITY_LABELS } from "@/types/business";
 import { cn } from "@/utils/cn";
 

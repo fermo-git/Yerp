@@ -4,6 +4,8 @@ import { LandingPage } from "@/pages/LandingPage";
 import { PlaceholderPage } from "@/pages/PlaceholderPage";
 import { LoginPage } from "@/pages/LoginPage";
 import { RegisterPage } from "@/pages/RegisterPage";
+import { RestaurantsPage } from "@/pages/RestaurantsPage";
+import { RestaurantDetailPage } from "@/pages/RestaurantDetailPage";
 
 export default function App() {
   return (
@@ -12,10 +14,11 @@ export default function App() {
         <Route element={<MainLayout />}>
           <Route path="/" element={<LandingPage />} />
           <Route path="/explorar" element={<PlaceholderPage title="Explorar negocios" />} />
+          <Route path="/restaurantes" element={<RestaurantsPage />} />
           <Route path="/eventos" element={<PlaceholderPage title="Eventos" />} />
           <Route path="/marketplace" element={<PlaceholderPage title="Marketplace local" />} />
           <Route path="/negocios/nuevo" element={<PlaceholderPage title="Publica tu negocio" />} />
-          <Route path="/negocios/:slug" element={<PlaceholderPage title="Detalle de negocio" />} />
+          <Route path="/negocios/:slug" element={<RestaurantDetailPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/registro" element={<RegisterPage />} />
         </Route>
