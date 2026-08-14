@@ -67,6 +67,10 @@ export interface Business {
   whatsapp?: string;
   email?: string;
   website?: string;
+  openStatus?: {
+    state: "OPEN" | "CLOSING_SOON" | "CLOSED";
+    label: string;
+  };
 }
 
 export interface RecentActivityItem {
@@ -97,11 +101,6 @@ export interface Review {
 export interface CreateReviewInput {
   rating: number;
   comment?: string;
-  author: {
-    id: string;
-    name: string;
-    avatarUrl?: string;
-  };
 }
 
 export const CITY_LABELS: Record<BorderCity, string> = {

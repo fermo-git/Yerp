@@ -89,7 +89,7 @@ export function RestaurantHero({
             {CATEGORY_LABELS[restaurant.category]}
           </p>
           <div className="mt-3">
-            <OpenStatusBadge hours={restaurant.hours} />
+            <OpenStatusBadge hours={restaurant.hours} status={restaurant.openStatus} />
           </div>
         </div>
 

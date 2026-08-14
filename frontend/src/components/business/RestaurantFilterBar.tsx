@@ -5,6 +5,7 @@ import type {
   RestaurantSort,
 } from "@/types/business";
 import { CITY_OPTIONS, PRICE_RANGE_LABELS } from "@/types/business";
+import { Select, type SelectOption } from "@/components/ui/Select";
 import { cn } from "@/utils/cn";
 
 interface RestaurantFilterBarProps {
@@ -17,24 +18,66 @@ interface RestaurantFilterBarProps {
   onSortChange: (sort: RestaurantSort) => void;
 }
 
-const RATING_OPTIONS = [
+const STAR_PATH =
+  "M10 1.5l2.6 5.3 5.85.85-4.23 4.12 1 5.83L10 14.9l-5.22 2.7 1-5.83L1.55 7.65l5.85-.85L10 1.5z";
+
+function Stars({ value }: { value: number }) {
+  return (
+    <span className="flex items-center gap-0.5">
+      {[1, 2, 3, 4, 5].map((i) => {
+        const isHalf = value % 1 !== 0 && i === Math.ceil(value);
+        if (i <= value) {
+          return (
+            <svg key={i} viewBox="0 0 20 20" className="h-3.5 w-3.5 fill-amber-deep">
+              <path d={STAR_PATH} />
+            </svg>
+          );
+        }
+        if (isHalf) {
+          return (
+            <span key={i} className="relative inline-block h-3.5 w-3.5">
+              <svg viewBox="0 0 20 20" className="absolute inset-0 h-full w-full fill-ink/15">
+                <path d={STAR_PATH} />
+              </svg>
+              <span className="absolute inset-y-0 left-0 w-1/2 overflow-hidden">
+                <svg viewBox="0 0 20 20" className="h-3.5 w-3.5 fill-amber-deep">
+                  <path d={STAR_PATH} />
+                </svg>
+              </span>
+            </span>
+          );
+        }
+        return (
+          <svg key={i} viewBox="0 0 20 20" className="h-3.5 w-3.5 fill-ink/15">
+            <path d={STAR_PATH} />
+          </svg>
+        );
+      })}
+    </span>
+  );
+}
+
+function StarLabel({ value }: { value: number }) {
+  return (
+    <span className="flex items-center gap-1.5">
+      <Stars value={value} />
+      <span className="text-ink-soft">y más</span>
+    </span>
+  );
+}
+
+const RATING_OPTIONS: SelectOption[] = [
   { value: "", label: "Cualquier rating" },
-  { value: "3", label: "3.0+" },
-  { value: "4", label: "4.0+" },
-  { value: "4.5", label: "4.5+" },
+  { value: "3", label: <StarLabel value={3} /> },
+  { value: "4", label: <StarLabel value={4} /> },
+  { value: "4.5", label: <StarLabel value={4.5} /> },
 ];
 
-const SORT_OPTIONS: { value: RestaurantSort; label: string }[] = [
+const SORT_OPTIONS: SelectOption[] = [
   { value: "NOVEDADES", label: "Novedades" },
   { value: "POPULARIDAD", label: "Popularidad" },
   { value: "MEJOR_VALORADOS", label: "Mejor valorados" },
 ];
-
-const selectClassName =
-  "appearance-none bg-transparent pr-1 text-sm font-medium text-ink focus:outline-none";
-
-const pillClassName =
-  "flex shrink-0 items-center gap-1.5 rounded-full border border-ink/10 bg-white px-3 py-1.5 text-sm";
 
 function PinIcon() {
   return (
@@ -53,10 +96,19 @@ function PinIcon() {
   );
 }
 
-function StarIcon() {
+function SortIcon() {
   return (
-    <svg viewBox="0 0 20 20" className="h-4 w-4 fill-amber-deep">
-      <path d="M10 1.5l2.6 5.3 5.85.85-4.23 4.12 1 5.83L10 14.9l-5.22 2.7 1-5.83L1.55 7.65l5.85-.85L10 1.5z" />
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-4 w-4 text-ink-soft"
+    >
+      <path d="M8 9l4-4 4 4" />
+      <path d="M8 15l4 4 4-4" />
     </svg>
   );
 }
@@ -85,93 +137,72 @@ export function RestaurantFilterBar({
   onFavoritesChange,
   onSortChange,
 }: RestaurantFilterBarProps) {
+  const cityOptions: SelectOption[] = CITY_OPTIONS.map((o) => ({
+    value: o.value,
+    label: o.label,
+  }));
+
   return (
-    <div className="flex items-center gap-2">
-      <div className="flex flex-1 items-center gap-2 overflow-x-auto pb-1">
-        <label className={pillClassName}>
-          <PinIcon />
-          <select
-            value={filters.city ?? ""}
-            onChange={(e) => onCityChange(e.target.value as BorderCity)}
-            aria-label="Ubicación"
-            className={selectClassName}
-          >
-            {CITY_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>
-                {o.label}
-              </option>
-            ))}
-          </select>
-        </label>
+    <div className="flex flex-wrap items-center gap-2">
+      <Select
+        value={filters.city ?? ""}
+        options={cityOptions}
+        onChange={(v) => onCityChange(v as BorderCity)}
+        icon={<PinIcon />}
+        ariaLabel="Ubicación"
+      />
 
-        <label className={pillClassName}>
-          <StarIcon />
-          <select
-            value={filters.rating == null ? "" : String(filters.rating)}
-            onChange={(e) =>
-              onRatingChange(e.target.value === "" ? null : Number(e.target.value))
-            }
-            aria-label="Rating"
-            className={selectClassName}
-          >
-            {RATING_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>
-                {o.label}
-              </option>
-            ))}
-          </select>
-        </label>
+      <Select
+        value={filters.rating == null ? "" : String(filters.rating)}
+        options={RATING_OPTIONS}
+        onChange={(v) => onRatingChange(v === "" ? null : Number(v))}
+        ariaLabel="Rating"
+      />
 
-        <div className="flex shrink-0 items-center gap-1.5">
-          {(Object.keys(PRICE_RANGE_LABELS) as PriceRange[]).map((p) => (
-            <button
-              key={p}
-              type="button"
-              onClick={() => onPriceToggle(p)}
-              className={cn(
-                "rounded-full border px-3 py-1.5 text-sm font-medium transition-colors",
-                filters.price.includes(p)
-                  ? "border-verde bg-verde-tint text-verde-deep"
-                  : "border-ink/15 text-ink-soft hover:border-ink/30 hover:text-ink"
-              )}
-            >
-              {PRICE_RANGE_LABELS[p]}
-            </button>
-          ))}
-        </div>
-
-        {isAuthenticated && (
+      <div className="flex items-center gap-1.5">
+        {(Object.keys(PRICE_RANGE_LABELS) as PriceRange[]).map((p) => (
           <button
+            key={p}
             type="button"
-            onClick={() => onFavoritesChange(!filters.favorites)}
+            onClick={() => onPriceToggle(p)}
             className={cn(
-              "flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors",
-              filters.favorites
+              "rounded-full border px-3 py-1.5 text-sm font-medium transition-colors",
+              filters.price.includes(p)
                 ? "border-verde bg-verde-tint text-verde-deep"
                 : "border-ink/15 text-ink-soft hover:border-ink/30 hover:text-ink"
             )}
           >
-            <HeartIcon filled={filters.favorites} />
-            Solo favoritos
+            {PRICE_RANGE_LABELS[p]}
           </button>
-        )}
+        ))}
       </div>
 
-      <label className={cn(pillClassName, "ml-auto")}>
-        <span className="hidden text-ink-soft sm:inline">Ordenar por</span>
-        <select
-          value={filters.sort}
-          onChange={(e) => onSortChange(e.target.value as RestaurantSort)}
-          aria-label="Ordenar"
-          className={cn(selectClassName, "font-semibold")}
+      {isAuthenticated && (
+        <button
+          type="button"
+          onClick={() => onFavoritesChange(!filters.favorites)}
+          className={cn(
+            "flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors",
+            filters.favorites
+              ? "border-verde bg-verde-tint text-verde-deep"
+              : "border-ink/15 text-ink-soft hover:border-ink/30 hover:text-ink"
+          )}
         >
-          {SORT_OPTIONS.map((o) => (
-            <option key={o.value} value={o.value}>
-              {o.label}
-            </option>
-          ))}
-        </select>
-      </label>
+          <HeartIcon filled={filters.favorites} />
+          Solo favoritos
+        </button>
+      )}
+
+      <div className="ml-auto">
+        <Select
+          value={filters.sort}
+          options={SORT_OPTIONS}
+          onChange={(v) => onSortChange(v as RestaurantSort)}
+          icon={<SortIcon />}
+          align="right"
+          ariaLabel="Ordenar"
+        />
+      </div>
     </div>
   );
 }

@@ -60,7 +60,7 @@ export function RestaurantCard({ restaurant, isFavorite, onToggleFavorite }: Res
           {restaurant.priceRange ? ` · ${PRICE_RANGE_LABELS[restaurant.priceRange]}` : ""}
         </p>
         <Rating value={restaurant.avgRating} reviewCount={restaurant.reviewCount} className="mt-0.5" />
-        <OpenStatusBadge hours={restaurant.hours} />
+        <OpenStatusBadge hours={restaurant.hours} status={restaurant.openStatus} />
       </div>
     </Link>
   );

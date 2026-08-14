@@ -13,19 +13,46 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { Button } from "@/components/ui/Button";
+import { Select, type SelectOption } from "@/components/ui/Select";
 import type { CreateReviewInput } from "@/types/business";
 
 type ReviewSort = "RECIENTES" | "ANTIGUAS";
 
-const pillClassName =
-  "flex items-center gap-1.5 rounded-full border border-ink/10 bg-white px-3 py-1.5 text-sm";
-const selectClassName =
-  "appearance-none bg-transparent text-sm font-medium text-ink focus:outline-none";
+const REVIEW_SORT_OPTIONS: SelectOption[] = [
+  { value: "RECIENTES", label: "Más recientes" },
+  { value: "ANTIGUAS", label: "Más antiguas" },
+];
+
+const STAR_OPTIONS: SelectOption[] = [
+  { value: "", label: "Todas las estrellas" },
+  { value: "5", label: "5 estrellas" },
+  { value: "4", label: "4 estrellas" },
+  { value: "3", label: "3 estrellas" },
+  { value: "2", label: "2 estrellas" },
+  { value: "1", label: "1 estrella" },
+];
 
 function StarGlyph() {
   return (
     <svg viewBox="0 0 20 20" className="h-4 w-4 fill-amber-deep">
       <path d="M10 1.5l2.6 5.3 5.85.85-4.23 4.12 1 5.83L10 14.9l-5.22 2.7 1-5.83L1.55 7.65l5.85-.85L10 1.5z" />
+    </svg>
+  );
+}
+
+function SortIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-4 w-4 text-ink-soft"
+    >
+      <path d="M8 9l4-4 4 4" />
+      <path d="M8 15l4 4 4-4" />
     </svg>
   );
 }
@@ -166,36 +193,21 @@ export function RestaurantDetailPage() {
         )}
 
         <div className="mt-6 flex flex-wrap items-center gap-2">
-          <label className={pillClassName}>
-            <select
-              value={reviewSort}
-              onChange={(e) => setReviewSort(e.target.value as ReviewSort)}
-              aria-label="Ordenar reseñas"
-              className={selectClassName}
-            >
-              <option value="RECIENTES">Más recientes</option>
-              <option value="ANTIGUAS">Más antiguas</option>
-            </select>
-          </label>
+          <Select
+            value={reviewSort}
+            options={REVIEW_SORT_OPTIONS}
+            onChange={(v) => setReviewSort(v as ReviewSort)}
+            icon={<SortIcon />}
+            ariaLabel="Ordenar reseñas"
+          />
 
-          <label className={pillClassName}>
-            <StarGlyph />
-            <select
-              value={selectedStar ?? ""}
-              onChange={(e) =>
-                setSelectedStar(e.target.value === "" ? null : Number(e.target.value))
-              }
-              aria-label="Filtrar por estrellas"
-              className={selectClassName}
-            >
-              <option value="">Todas las estrellas</option>
-              <option value="5">5 estrellas</option>
-              <option value="4">4 estrellas</option>
-              <option value="3">3 estrellas</option>
-              <option value="2">2 estrellas</option>
-              <option value="1">1 estrella</option>
-            </select>
-          </label>
+          <Select
+            value={selectedStar == null ? "" : String(selectedStar)}
+            options={STAR_OPTIONS}
+            onChange={(v) => setSelectedStar(v === "" ? null : Number(v))}
+            icon={<StarGlyph />}
+            ariaLabel="Filtrar por estrellas"
+          />
         </div>
 
         <div className="mt-6 grid grid-cols-1 gap-8 lg:grid-cols-3">
@@ -217,6 +229,7 @@ export function RestaurantDetailPage() {
                 createReview.mutate({ businessId: restaurant.id, input })
               }
               isSubmitting={createReview.isPending}
+              submitError={createReview.error instanceof Error ? createReview.error.message : null}
             />
           </div>
         </div>

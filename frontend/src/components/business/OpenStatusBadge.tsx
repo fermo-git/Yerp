@@ -1,4 +1,4 @@
-import { getOpenStatus, type OpenState } from "@/utils/hours";
+import { getOpenStatus, type OpenState, type OpenStatus } from "@/utils/hours";
 import type { BusinessHours } from "@/types/business";
 import { cn } from "@/utils/cn";
 
@@ -14,18 +14,24 @@ const dotStyles: Record<OpenState, string> = {
   CLOSED: "bg-ink/30",
 };
 
-export function OpenStatusBadge({ hours }: { hours?: BusinessHours[] }) {
-  const status = getOpenStatus(hours);
+export function OpenStatusBadge({
+  hours,
+  status,
+}: {
+  hours?: BusinessHours[];
+  status?: OpenStatus;
+}) {
+  const resolved: OpenStatus = status ?? getOpenStatus(hours);
 
   return (
     <span
       className={cn(
         "inline-flex w-fit items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium",
-        toneStyles[status.state]
+        toneStyles[resolved.state]
       )}
     >
-      <span className={cn("h-1.5 w-1.5 rounded-full", dotStyles[status.state])} />
-      {status.label}
+      <span className={cn("h-1.5 w-1.5 rounded-full", dotStyles[resolved.state])} />
+      {resolved.label}
     </span>
   );
 }

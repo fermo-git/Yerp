@@ -2,14 +2,15 @@
 
 ## Scope
 
-- `frontend/` — React 19 + Vite SPA. `backend/` — Express + Prisma API (solo auth por ahora).
-- Auth usa la API real (`backend`); negocios/widgets siguen leyendo mocks tipados.
+- `frontend/` — React 19 + Vite SPA. `backend/` — Express + Prisma API (auth + negocios/restaurantes).
+- Auth y restaurantes usan la API real (`backend`); widgets y la landing "destacados" siguen leyendo mocks tipados.
 
 ## Database & backend
 
 - PostgreSQL vía Docker: `docker compose up -d` (puerto `5433`, base `lafrontera`). Credenciales en `backend/.env`.
 - Instalar backend: `npm install` desde `backend/`.
 - Migrar/generar: `npm run prisma:generate` y `npm run prisma:migrate` desde `backend/` (apuntan a `backend/prisma/schema.prisma`).
+- Sembrar: `npm run prisma:seed` desde `backend/` (restaurantes + horarios + galería + reseñas; dueño demo `owner@lafrontera.mx` / `demo1234`).
 - Arrancar backend: `npm run dev` desde `backend/` (Express en puerto `4000`).
 
 ## Frontend commands
@@ -29,6 +30,7 @@
 
 ## Integration
 
-- `services/api/auth.ts` usa `apiClient` (real); los demás services usan mocks con latencia (`mockDelay`).
+- `services/api/auth.ts`, `restaurants.ts` y `reviews.ts` usan `apiClient` (real); los demás services (widgets, actividad) usan mocks con latencia (`mockDelay`).
 - `apiClient` lee `VITE_API_URL`, adjunta `Authorization: Bearer` desde `localStorage` (`la-frontera:token`) y desenvuelve el campo `data` del envelope REST `{ data }` / `{ error: { code, message } }`.
 - Endpoints auth implementados: `POST /auth/register|login`, `GET /auth/me`, `PATCH /users/me`, `GET|PUT /users/me/interests`. Google OAuth es un stub (`501`).
+- Endpoints negocios implementados: `GET /businesses` (filtros `city`, `category`, `q`, `minRating`, `priceRange`, `sort`), `GET /businesses/:slug`, `GET|POST /businesses/:id/reviews` (POST requiere auth, 1 reseña por usuario, recalcula `avgRating`/`reviewCount`). `isOpen` se calcula server-side con mapa ciudad→timezone en `backend/lib/hours.js`.

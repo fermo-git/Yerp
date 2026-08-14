@@ -17,9 +17,10 @@ type FormValues = z.infer<typeof schema>;
 interface ReviewFormProps {
   onSubmit: (input: CreateReviewInput) => void;
   isSubmitting: boolean;
+  submitError?: string | null;
 }
 
-export function ReviewForm({ onSubmit, isSubmitting }: ReviewFormProps) {
+export function ReviewForm({ onSubmit, isSubmitting, submitError }: ReviewFormProps) {
   const { user } = useAuth();
   const {
     control,
@@ -46,11 +47,7 @@ export function ReviewForm({ onSubmit, isSubmitting }: ReviewFormProps) {
   return (
     <form
       onSubmit={handleSubmit((values) => {
-        onSubmit({
-          rating: values.rating,
-          comment: values.comment.trim() || undefined,
-          author: { id: user.id, name: user.name, avatarUrl: user.avatarUrl },
-        });
+        onSubmit({ rating: values.rating, comment: values.comment.trim() || undefined });
         reset();
       })}
       className="rounded-2xl border border-ink/10 bg-white p-5"
@@ -93,6 +90,8 @@ export function ReviewForm({ onSubmit, isSubmitting }: ReviewFormProps) {
         className="mt-3 w-full rounded-xl border border-ink/10 bg-white px-4 py-3 text-sm text-ink placeholder:text-ink-soft/70 focus:border-verde focus:outline-none focus:ring-2 focus:ring-verde/20"
       />
       {errors.comment && <p className="mt-1 text-xs text-amber-deep">{errors.comment.message}</p>}
+
+      {submitError && <p className="mt-2 text-xs text-amber-deep">{submitError}</p>}
 
       <div className="mt-3 flex justify-end">
         <Button type="submit" size="sm" disabled={isSubmitting}>
