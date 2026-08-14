@@ -43,11 +43,15 @@ Base URL: `/api/v1`. Todas las respuestas: `{ data, meta? }` en éxito,
 ## Marketplace
 | Método | Ruta | Descripción |
 |---|---|---|
-| GET  | `/marketplace` | Listado con filtros (`city`, `category`, `q`) |
-| GET  | `/marketplace/:id` | Detalle de anuncio |
-| POST | `/marketplace` | Crear anuncio (solo datos de contacto) |
-| PATCH | `/marketplace/:id` | Editar anuncio propio |
-| DELETE | `/marketplace/:id` | Eliminar anuncio propio |
+| GET  | `/marketplace` | Listado con filtros (`city`, `category`, `q`) y paginación (`page`, `limit` default 20). Responde `{ listings, meta: { page, limit, total, totalPages } }` |
+| GET  | `/marketplace/:id` | Detalle de anuncio por ID. Incluye info del vendedor |
+| POST | `/marketplace` | Crear anuncio (requiere auth). Body: `{ title, description?, price?, category, city, imageUrl?, contactName?, contactPhone?, contactWhatsapp?, contactEmail? }` |
+| PATCH | `/marketplace/:id` | Editar anuncio propio (requiere auth + ser el dueño) |
+| DELETE | `/marketplace/:id` | Eliminar anuncio propio (requiere auth + ser el dueño) |
+
+**Categorías de marketplace:** `VEHICULOS`, `INMUEBLES`, `ELECTRONICA`, `HOGAR_Y_JARDIN`, `EMPLEO`, `SERVICIOS`, `MODA`, `OTRO`
+
+**Estados:** `ACTIVE`, `SOLD`, `EXPIRED`, `ARCHIVED`
 
 ## Eventos
 | Método | Ruta | Descripción |
