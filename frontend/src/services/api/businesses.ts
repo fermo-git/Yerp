@@ -1,6 +1,13 @@
-import type { Business, RecentActivityItem, BorderWidgetsSnapshot } from "@/types/business";
+import type {
+  Business,
+  RecentActivityItem,
+  BorderWidgetsSnapshot,
+  CreateBusinessInput,
+  CreateBusinessResponse,
+  UploadGalleryResponse,
+} from "@/types/business";
 import { MOCK_BUSINESSES, MOCK_RECENT_ACTIVITY, MOCK_WIDGETS } from "@/services/mocks/businesses.mock";
-import { mockDelay } from "@/services/api/client";
+import { apiClient, mockDelay } from "@/services/api/client";
 
 // -----------------------------------------------------------------
 // Capa de servicios "businesses".
@@ -47,4 +54,40 @@ export async function getRecentActivity(): Promise<RecentActivityItem[]> {
 export async function getBorderWidgets(): Promise<BorderWidgetsSnapshot> {
   await mockDelay(300);
   return MOCK_WIDGETS;
+}
+
+// -----------------------------------------------------------------
+// Endpoints reales (no mocks) para publicar un negocio y su galería.
+// POST /businesses crea el negocio; POST /businesses/:id/gallery sube
+// las imágenes (multipart/form-data, campo "gallery").
+// -----------------------------------------------------------------
+
+export async function createBusiness(
+  input: CreateBusinessInput
+): Promise<CreateBusinessResponse> {
+  return apiClient.post<CreateBusinessResponse>("/businesses", input);
+}
+
+export async function uploadBusinessGallery(
+  businessId: string,
+  files: File[]
+): Promise<UploadGalleryResponse> {
+  const form = new FormData();
+  files.forEach((file) => form.append("gallery", file, file.name));
+  return apiClient.upload<UploadGalleryResponse>(
+    `/businesses/${businessId}/gallery`,
+    form
+  );
+}
+
+export async function uploadBusinessMenu(
+  businessId: string,
+  file: File
+): Promise<{ menuUrl: string; type: string }> {
+  const form = new FormData();
+  form.append("menu", file, file.name);
+  return apiClient.upload<{ menuUrl: string; type: string }>(
+    `/businesses/${businessId}/menu`,
+    form
+  );
 }
