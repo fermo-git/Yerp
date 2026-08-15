@@ -83,7 +83,7 @@ Abre http://localhost:5173 y usa **Crear cuenta** (Cuenta → Ciudad → Interes
 | `backend/` | `npm run prisma:generate` | Regenera el cliente Prisma tras cambiar el schema |
 | `backend/` | `npm run prisma:migrate -- --name <nombre>` | Crea/aplica una migración |
 | `backend/` | `npm run prisma:studio` | Interfaz visual de Prisma |
-| `backend/` | `npm run prisma:seed` | Puebla la tabla `BorderCrossing` con las garitas reales (una sola vez, es seguro re-correrlo) |
+| `backend/` | `npm run prisma:seed` | Puebla la BD: garitas reales + restaurantes, horarios, galería y reseñas de ejemplo (es seguro re-correrlo) |
 | `frontend/` | `npm run dev` | Dev server (Vite) en `:5173` |
 | `frontend/` | `npm run build` | TypeScript estricto + build de producción |
 
@@ -108,8 +108,8 @@ Abre http://localhost:5173 y usa **Crear cuenta** (Cuenta → Ciudad → Interes
 
 ## Notas
 
-- **Auth** usa la API real (`backend`). El resto de secciones (negocios, widgets) aún leen **mocks** tipados en el frontend.
-- **Marketplace** está completamente implementado: backend (CRUD con filtros y paginación) + frontend (listado, detalle, creación con autenticación).
+- **Auth** usa la API real (`backend`). **Restaurantes** y **Marketplace** usan la API real; los widgets de la landing aún leen **mocks** tipados en el frontend.
+- El seed (`npm run prisma:seed`) puebla las garitas del feed CBP y crea un dueño demo `owner@lafrontera.mx` / `demo1234` (rol `BUSINESS_OWNER`), 13 restaurantes con horarios/galería y ~20 reseñas. Los negocios se sirven desde `GET /businesses`, `GET /businesses/:slug` y `GET|POST /businesses/:id/reviews`.
 - El endpoint de **Google OAuth** es un stub (`501`) por ahora.
 - `npm run lint` en el frontend falla porque `eslint` no está declarado/instalado; no hay scripts de test ni formateo.
 - El schema vive en `backend/prisma/schema.prisma`; los scripts del backend ya apuntan a él (`npm run prisma:generate`, `prisma:migrate`).

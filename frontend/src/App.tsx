@@ -7,6 +7,8 @@ import { RegisterPage } from "@/pages/RegisterPage";
 import { MarketplacePage } from "@/pages/MarketplacePage";
 import { MarketplaceDetailPage } from "@/pages/MarketplaceDetailPage";
 import { GaritaPage } from "@/pages/GaritaPage";
+import { RestaurantsPage } from "@/pages/RestaurantsPage";
+import { RestaurantDetailPage } from "@/pages/RestaurantDetailPage";
 import { NewBusinessPage } from "@/pages/NewBusinessPage";
 
 export default function App() {
@@ -17,12 +19,12 @@ export default function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/explorar" element={<PlaceholderPage title="Explorar negocios" />} />
           <Route path="/eventos" element={<PlaceholderPage title="Eventos" />} />
-<Route path="/marketplace" element={<MarketplacePage />} />
+          <Route path="/marketplace" element={<MarketplacePage />} />
           <Route path="/marketplace/:id" element={<MarketplaceDetailPage />} />
           <Route path="/garitas" element={<GaritaPage />} />
-          <Route path="/restaurantes" element={<PlaceholderPage title="Restaurantes" />} />
+          <Route path="/restaurantes" element={<RestaurantsPage />} />
           <Route path="/negocios/nuevo" element={<NewBusinessPage />} />
-          <Route path="/negocios/:slug" element={<PlaceholderPage title="Detalle de negocio" />} />
+          <Route path="/negocios/:slug" element={<RestaurantDetailPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/registro" element={<RegisterPage />} />
         </Route>

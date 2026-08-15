@@ -1,5 +1,5 @@
--- DropColumn
-ALTER TABLE "businesses" DROP COLUMN "hours";
+-- AlterTable
+ALTER TABLE "businesses" ADD COLUMN "menuUrl" TEXT;
 
 -- CreateTable
 CREATE TABLE "business_hours" (

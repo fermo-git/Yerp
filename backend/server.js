@@ -22,9 +22,7 @@ const UPLOAD_DIR = path.resolve(__dirname, "uploads");
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-app.use(
-  helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } })
-);
+app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 app.use(cors({ origin: process.env.CORS_ORIGIN || "http://localhost:5173" }));
 app.use(express.json({ limit: "1mb" }));
 
@@ -65,7 +63,13 @@ app.use((err, _req, res, _next) => {
       },
     });
   }
-  if (err?.code === "LIMIT_FILE_SIZE" || err?.code === "IMAGE_TOO_SMALL" || err?.code === "WRONG_ASPECT_RATIO" || err?.code === "INVALID_IMAGE_TYPE" || err?.code === "INVALID_IMAGE") {
+  if (
+    err?.code === "LIMIT_FILE_SIZE" ||
+    err?.code === "IMAGE_TOO_SMALL" ||
+    err?.code === "WRONG_ASPECT_RATIO" ||
+    err?.code === "INVALID_IMAGE_TYPE" ||
+    err?.code === "INVALID_IMAGE"
+  ) {
     return res.status(400).json({
       error: { code: "UPLOAD_VALIDATION", message: err.message ?? "Imagen inválida" },
     });

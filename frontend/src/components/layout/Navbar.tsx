@@ -56,7 +56,7 @@ const NAV_LINKS = [
     ),
   },
   {
-    label: "Negocios",
+    label: "Publica tu negocio",
     to: "/negocios/nuevo",
     icon: icon(<path d="M4 8h16v12H4zM9 8V5a3 3 0 0 1 6 0v3M4 13h16" />),
   },

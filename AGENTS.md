@@ -2,14 +2,15 @@
 
 ## Scope
 
-- `frontend/` — React 19 + Vite SPA. `backend/` — Express + Prisma API (auth + publicación de negocios).
-- Auth y publicación de negocios (create + galería) usan la API real (`backend`); el listado/detalle de negocios y los widgets siguen leyendo mocks tipados.
+- `frontend/` — React 19 + Vite SPA. `backend/` — Express + Prisma API (auth + negocios: publicar, listar/detalle, reseñas).
+- Auth, restaurantes (listado/detalle/reseñas) y publicación de negocios (create + galería + menú) usan la API real (`backend`); los widgets y la landing "destacados" siguen leyendo mocks tipados.
 
 ## Database & backend
 
 - PostgreSQL vía Docker: `docker compose up -d` (puerto `5433`, base `lafrontera`). Credenciales en `backend/.env`.
 - Instalar backend: `npm install` desde `backend/`.
 - Migrar/generar: `npm run prisma:generate` y `npm run prisma:migrate` desde `backend/` (apuntan a `backend/prisma/schema.prisma`).
+- Sembrar: `npm run prisma:seed` desde `backend/` (restaurantes + horarios + galería + reseñas; dueño demo `owner@lafrontera.mx` / `demo1234`).
 - Arrancar backend: `npm run dev` desde `backend/` (Express en puerto `4000`).
 
 ## Frontend commands
@@ -29,14 +30,15 @@
 
 ## Integration
 
-- `services/api/auth.ts` y `services/api/businesses.ts` (create + galería) usan `apiClient` (real); el resto de `businesses.ts` y los widgets siguen usando mocks con latencia (`mockDelay`).
+- `services/api/auth.ts`, `restaurants.ts`, `reviews.ts` y `businesses.ts` (create + galería + menú) usan `apiClient` (real); los widgets y la actividad siguen usando mocks con latencia (`mockDelay`).
 - `apiClient` lee `VITE_API_URL`, adjunta `Authorization: Bearer` desde `localStorage` (`la-frontera:token`) y desenvuelve el campo `data` del envelope REST `{ data }` / `{ error: { code, message } }`.
 - `apiClient.upload(path, FormData)` es la variante para `multipart/form-data` (NO fija `Content-Type`; deja que el navegador ponga el boundary y solo adjunta el `Authorization`).
 - Endpoints auth implementados: `POST /auth/register|login`, `GET /auth/me`, `PATCH /users/me`, `GET|PUT /users/me/interests`. Google OAuth es un stub (`501`).
-- Endpoints de negocios implementados: `POST /businesses` (crea negocio + horarios, solo `BUSINESS_OWNER`), `POST /businesses/:id/gallery` (imágenes, solo el dueño), `POST /businesses/:id/menu` (menú imagen/PDF, solo el dueño). El resto del contrato en `frontend/API_ENDPOINTS.md` (listado, detalle, reseñas, marketplace, eventos, widgets, search) sigue pendiente y se consume vía mocks.
+- Endpoints negocios (publicar): `POST /businesses` (crea negocio + horarios, solo `BUSINESS_OWNER`), `POST /businesses/:id/gallery` (imágenes, solo el dueño), `POST /businesses/:id/menu` (menú imagen/PDF, solo el dueño).
+- Endpoints negocios (consumo): `GET /businesses` (filtros `city`, `category`, `q`, `minRating`, `priceRange`, `sort`), `GET /businesses/:slug`, `GET|POST /businesses/:id/reviews` (POST requiere auth, 1 reseña por usuario, recalcula `avgRating`/`reviewCount`). `isOpen` se calcula server-side con mapa ciudad→timezone en `backend/lib/hours.js`.
 - Endpoints geo implementados (proxy de Nominatim con caché + rate limit + `User-Agent` propio): `GET /geo/search?q=&city=` y `GET /geo/reverse?lat=&lng=` en `routes/geo.routes.js`. El frontend NO llama a Nominatim directo; usa `services/api/geo.ts`.
 
-## Negocios — Publicar negocio (nuevo)
+## Negocios — Publicar negocio
 
 Funcionalidad: desde la pestaña "Negocios" (`/negocios/nuevo`, antes placeholder) un `BUSINESS_OWNER` publica un negocio y sube hasta 10 imágenes 16:9.
 
@@ -72,10 +74,10 @@ Funcionalidad: desde la pestaña "Negocios" (`/negocios/nuevo`, antes placeholde
 - El proxy geo (`routes/geo.routes.js`) restringe la búsqueda a un `viewbox` de ~50 km alrededor de la ciudad elegida (`countrycodes=mx&bounded=1`); sin ciudad, busca en todo México.
 
 ### Archivos nuevos / modificados
-- Backend nuevos: `backend/lib/slug.js`, `backend/lib/upload.js`, `backend/routes/businesses.routes.js`, `backend/routes/geo.routes.js`.
-- Backend modificados: `backend/lib/auth.js` (`requireRole`), `backend/server.js` (helmet, multer, estático `/uploads`, montaje `/api/v1/businesses` y `/api/v1/geo`), `backend/.env.example` (`PUBLIC_BASE_URL`), `backend/package.json` (deps: `multer`, `helmet`, `express-rate-limit`, `sharp`).
-- Frontend nuevos: `frontend/src/pages/NewBusinessPage.tsx`, `frontend/src/components/business/NewBusinessForm.tsx`, `frontend/src/components/business/ImageUploader.tsx`, `frontend/src/components/business/MapPicker.tsx`, `frontend/src/services/api/geo.ts`.
-- Frontend modificados: `frontend/src/App.tsx` (ruta `/negocios/nuevo` → `NewBusinessPage`), `frontend/src/services/api/client.ts` (`apiClient.upload`), `frontend/src/services/api/businesses.ts` (`createBusiness`, `uploadBusinessGallery`, `uploadBusinessMenu`), `frontend/src/hooks/useBusinesses.ts` (`useCreateBusiness`, `useUploadGallery`, `useUploadMenu`), `frontend/src/types/business.ts` (`CreateBusinessInput`, `BusinessDTO`, `BusinessHourDTO`, `BORDER_CITIES`, `BUSINESS_CATEGORIES`, `PRICE_RANGES`/`PRICE_RANGE_OPTIONS`).
+- Backend nuevos: `backend/lib/slug.js`, `backend/lib/upload.js`, `backend/lib/hours.js`, `backend/routes/businesses.routes.js`, `backend/routes/geo.routes.js`, `backend/prisma/seed.js`.
+- Backend modificados: `backend/lib/auth.js` (`requireRole`), `backend/lib/serialize.js` (`serializeBusiness`/`serializeReview`), `backend/server.js` (helmet, multer, estático `/uploads`, montaje `/api/v1/businesses` y `/api/v1/geo`), `backend/.env.example` (`PUBLIC_BASE_URL`), `backend/package.json` (deps: `multer`, `helmet`, `express-rate-limit`, `sharp`; script `prisma:seed`).
+- Frontend nuevos: `frontend/src/pages/NewBusinessPage.tsx`, `frontend/src/pages/RestaurantsPage.tsx`, `frontend/src/pages/RestaurantDetailPage.tsx`, `frontend/src/components/business/NewBusinessForm.tsx`, `frontend/src/components/business/ImageUploader.tsx`, `frontend/src/components/business/MapPicker.tsx`, `frontend/src/services/api/geo.ts`, `frontend/src/services/api/restaurants.ts`, `frontend/src/services/api/reviews.ts`.
+- Frontend modificados: `frontend/src/App.tsx` (rutas `/negocios/nuevo`, `/restaurantes`, `/negocios/:slug`), `frontend/src/services/api/client.ts` (`apiClient.upload`), `frontend/src/services/api/businesses.ts` (`createBusiness`, `uploadBusinessGallery`, `uploadBusinessMenu`), `frontend/src/hooks/useBusinesses.ts` (`useCreateBusiness`, `useUploadGallery`, `useUploadMenu`), `frontend/src/types/business.ts`.
 - Limpieza de imports no usados: `components/business/Hero.tsx` y `components/widgets/BorderWidgetsStrip.tsx` (ya no importan `Eyebrow`) — necesario para que `npm run build` (TS estricto, `noUnusedLocals`) pase.
 
 ### Notas

@@ -28,6 +28,23 @@ export type BusinessCategory =
 
 export type PriceRange = "ECONOMICO" | "MODERADO" | "ALTO" | "PREMIUM";
 
+export type RestaurantSort = "NOVEDADES" | "POPULARIDAD" | "MEJOR_VALORADOS";
+
+export interface BusinessHours {
+  dayOfWeek: number; // 0 (domingo) - 6 (sábado)
+  opensAt: string; // "HH:MM" en 24h
+  closesAt: string; // "HH:MM" en 24h
+}
+
+export interface RestaurantFilters {
+  city?: BorderCity;
+  q: string;
+  rating: number | null;
+  price: PriceRange[];
+  favorites: boolean;
+  sort: RestaurantSort;
+}
+
 export interface Business {
   id: string;
   slug: string;
@@ -44,6 +61,16 @@ export interface Business {
   featured: boolean;
   avgRating: number;
   reviewCount: number;
+  hours?: BusinessHours[];
+  createdAt?: string;
+  phone?: string;
+  whatsapp?: string;
+  email?: string;
+  website?: string;
+  openStatus?: {
+    state: "OPEN" | "CLOSING_SOON" | "CLOSED";
+    label: string;
+  };
 }
 
 export interface RecentActivityItem {
@@ -55,6 +82,25 @@ export interface RecentActivityItem {
   business: Pick<Business, "id" | "slug" | "name" | "coverImageUrl" | "avgRating" | "reviewCount" | "category">;
   reviewComment?: string;
   reviewRating?: number;
+}
+
+export interface Review {
+  id: string;
+  businessId: string;
+  rating: number; // 1-5
+  comment?: string;
+  createdAt: string;
+  updatedAt: string;
+  user: {
+    id: string;
+    name: string;
+    avatarUrl?: string;
+  };
+}
+
+export interface CreateReviewInput {
+  rating: number;
+  comment?: string;
 }
 
 export const CITY_LABELS: Record<BorderCity, string> = {
