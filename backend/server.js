@@ -3,6 +3,11 @@ import express from "express";
 import cors from "cors";
 import authRoutes from "./routes/auth.routes.js";
 import userRoutes from "./routes/users.routes.js";
+import crossingsRoutes from "./routes/crossings.routes.js";
+import cron from "node-cron";
+import { syncWaitTimesFromCBP } from "./services/cbpSync.js";
+import { recalculatePatterns } from "./services/patternAggregation.js";
+import contextRoutes from "./routes/context.routes.js";
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -14,6 +19,8 @@ app.get("/health", (_req, res) => res.json({ ok: true }));
 
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/users", userRoutes);
+app.use("/api/v1/crossings", crossingsRoutes);
+app.use("/api/v1/context", contextRoutes);
 
 app.use((_req, res) => {
   res.status(404).json({ error: { code: "NOT_FOUND", message: "Ruta no encontrada" } });
@@ -34,4 +41,24 @@ app.use((err, _req, res, _next) => {
 
 app.listen(PORT, () => {
   console.log(`La Frontera API escuchando en http://localhost:${PORT}`);
+});
+
+cron.schedule("*/15 * * * *", async () => {
+  try {
+    await syncWaitTimesFromCBP();
+  } catch (err) {
+    console.error("[cbpSync] Error en sincronización programada:", err);
+  }
+});
+
+syncWaitTimesFromCBP().catch((err) =>
+  console.error("[cbpSync] Error en sincronización inicial:", err)
+);
+
+cron.schedule("0 3 * * *", async () => {
+  try {
+    await recalculatePatterns();
+  } catch (err) {
+    console.error("[patternAggregation] Error:", err);
+  }
 });
