@@ -107,9 +107,27 @@ Abre http://localhost:5173 y usa **Crear cuenta** (Cuenta → Ciudad → Interes
 ## Notas
 
 - **Auth** usa la API real (`backend`). El resto de secciones (negocios, widgets) aún leen **mocks** tipados en el frontend.
+- **Marketplace** está completamente implementado: backend (CRUD con filtros y paginación) + frontend (listado, detalle, creación con autenticación).
 - El endpoint de **Google OAuth** es un stub (`501`) por ahora.
 - `npm run lint` en el frontend falla porque `eslint` no está declarado/instalado; no hay scripts de test ni formateo.
 - El schema vive en `backend/prisma/schema.prisma`; los scripts del backend ya apuntan a él (`npm run prisma:generate`, `prisma:migrate`).
+
+## Marketplace
+
+El módulo de marketplace permite a usuarios autenticados publicar artículos para compra/venta local.
+
+**Características implementadas:**
+- Listado con paginación (20 items por página)
+- Filtros por ciudad, categoría y búsqueda de texto
+- Vista de detalle con imagen grande, descripción completa y datos de contacto del vendedor
+- Creación de publicaciones (requiere autenticación)
+- Campos del formulario alineados al schema de base de datos
+
+**Rutas:**
+- `/marketplace` — Listado de publicaciones
+- `/marketplace/:id` — Detalle de una publicación
+
+**Endpoints:** Ver `frontend/API_ENDPOINTS.md` sección Marketplace.
 
 ## Solución de problemas
 

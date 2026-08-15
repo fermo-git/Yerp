@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
-import { Eyebrow } from "@/components/ui/Eyebrow";
 import { Saguaro } from "@/components/brand/Cactus";
 import { RouteLine } from "@/components/brand/RouteLine";
 import { PinIcon } from "@/components/brand/Icons";
