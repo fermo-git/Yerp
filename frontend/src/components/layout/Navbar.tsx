@@ -30,6 +30,17 @@ const NAV_LINKS = [
     ),
   },
   {
+  {
+    label: "Garitas",
+    to: "/garitas",
+    icon: icon(
+      <>
+        <rect x="4" y="3" width="16" height="18" rx="2" />
+        <path d="M8 8h8M8 12h8M8 16h5" />
+      </>
+    ),
+  },
+  {
     label: "Restaurantes",
     to: "/restaurantes",
     icon: icon(<path d="M5 3v8a2 2 0 0 0 2 2v8M9 3v6M5 3h4M19 3v18M19 3c-2 0-3 2-3 5s1 4 3 4" />),

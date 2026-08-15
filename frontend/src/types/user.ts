@@ -49,4 +49,5 @@ export interface UpdateMeInput {
   phone?: string;
   city?: BorderCity;
   avatarUrl?: string;
+  favoriteCrossingId?: string | null;
 }

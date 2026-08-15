@@ -27,6 +27,7 @@ const updateSchema = z.object({
   phone: z.string().nullable().optional(),
   city: z.string().min(2).optional(),
   avatarUrl: z.string().url().nullable().optional(),
+  favoriteCrossingId: z.string().uuid().nullable().optional(),
 });
 
 router.patch("/me", async (req, res, next) => {
@@ -37,6 +38,19 @@ router.patch("/me", async (req, res, next) => {
     if (input.phone !== undefined) data.phone = input.phone;
     if (input.city !== undefined) data.city = input.city;
     if (input.avatarUrl !== undefined) data.avatarUrl = input.avatarUrl;
+    if (input.favoriteCrossingId !== undefined) {
+    if (input.favoriteCrossingId !== null) {
+      const exists = await prisma.borderCrossing.findUnique({
+        where: { id: input.favoriteCrossingId },
+      });
+      if (!exists) {
+        return res.status(400).json({
+          error: { code: "VALIDATION_ERROR", message: "Garita favorita no válida" },
+        });
+      }
+    }
+    data.favoriteCrossingId = input.favoriteCrossingId;
+  }
     await prisma.user.update({ where: { id: req.userId }, data });
     return res.json({ data: { user: await serializeUser(req.userId) } });
   } catch (err) {

@@ -6,6 +6,7 @@ import { LoginPage } from "@/pages/LoginPage";
 import { RegisterPage } from "@/pages/RegisterPage";
 import { MarketplacePage } from "@/pages/MarketplacePage";
 import { MarketplaceDetailPage } from "@/pages/MarketplaceDetailPage";
+import { GaritaPage } from "@/pages/GaritaPage";
 
 export default function App() {
   return (
@@ -17,6 +18,7 @@ export default function App() {
           <Route path="/eventos" element={<PlaceholderPage title="Eventos" />} />
           <Route path="/marketplace" element={<MarketplacePage />} />
           <Route path="/marketplace/:id" element={<MarketplaceDetailPage />} />
+          <Route path="/garitas" element={<GaritaPage />} />
           <Route path="/restaurantes" element={<PlaceholderPage title="Restaurantes" />} />
           <Route path="/negocios/nuevo" element={<PlaceholderPage title="Publica tu negocio" />} />
           <Route path="/negocios/:slug" element={<PlaceholderPage title="Detalle de negocio" />} />
