@@ -79,3 +79,10 @@ export const MARKETPLACE_CATEGORY_LABELS: Record<MarketplaceCategory, string> = 
 export const MARKETPLACE_CATEGORY_OPTIONS: { value: MarketplaceCategory; label: string }[] = (
   Object.entries(MARKETPLACE_CATEGORY_LABELS) as [MarketplaceCategory, string][]
 ).map(([value, label]) => ({ value, label }));
+
+export const MARKETPLACE_STATUS_LABELS: Record<MarketplaceStatus, string> = {
+  ACTIVE: "Activa",
+  SOLD: "Vendida",
+  EXPIRED: "Expirada",
+  ARCHIVED: "Archivada",
+};

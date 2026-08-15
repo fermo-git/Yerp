@@ -102,6 +102,44 @@ router.get("/", async (req, res, next) => {
   }
 });
 
+router.get("/mine", authRequired, async (req, res, next) => {
+  try {
+    const listings = await prisma.marketplaceListing.findMany({
+      where: { sellerId: req.userId },
+      orderBy: { createdAt: "desc" },
+      include: {
+        seller: {
+          select: { id: true, name: true, avatarUrl: true, city: true },
+        },
+      },
+    });
+
+    const serialized = listings.map((l) => ({
+      id: l.id,
+      sellerId: l.sellerId,
+      title: l.title,
+      slug: l.slug,
+      description: l.description,
+      price: l.price ? Number(l.price) : null,
+      category: l.category,
+      status: l.status,
+      city: l.city,
+      imageUrl: l.imageUrl,
+      contactName: l.contactName,
+      contactPhone: l.contactPhone,
+      contactWhatsapp: l.contactWhatsapp,
+      contactEmail: l.contactEmail,
+      createdAt: l.createdAt,
+      updatedAt: l.updatedAt,
+      seller: l.seller,
+    }));
+
+    return res.json({ data: { listings: serialized } });
+  } catch (err) {
+    next(err);
+  }
+});
+
 router.get("/:id", async (req, res, next) => {
   try {
     const listing = await prisma.marketplaceListing.findUnique({

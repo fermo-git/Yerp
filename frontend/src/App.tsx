@@ -6,6 +6,7 @@ import { LoginPage } from "@/pages/LoginPage";
 import { RegisterPage } from "@/pages/RegisterPage";
 import { MarketplacePage } from "@/pages/MarketplacePage";
 import { MarketplaceDetailPage } from "@/pages/MarketplaceDetailPage";
+import { MyMarketplaceListingsPage } from "@/pages/MyMarketplaceListingsPage";
 
 export default function App() {
   return (
@@ -16,6 +17,7 @@ export default function App() {
           <Route path="/explorar" element={<PlaceholderPage title="Explorar negocios" />} />
           <Route path="/eventos" element={<PlaceholderPage title="Eventos" />} />
           <Route path="/marketplace" element={<MarketplacePage />} />
+          <Route path="/marketplace/mias" element={<MyMarketplaceListingsPage />} />
           <Route path="/marketplace/:id" element={<MarketplaceDetailPage />} />
           <Route path="/negocios/nuevo" element={<PlaceholderPage title="Publica tu negocio" />} />
           <Route path="/negocios/:slug" element={<PlaceholderPage title="Detalle de negocio" />} />
