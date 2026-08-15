@@ -5,10 +5,6 @@ import { PlaceholderPage } from "@/pages/PlaceholderPage";
 import { LoginPage } from "@/pages/LoginPage";
 import { RegisterPage } from "@/pages/RegisterPage";
 
-import { MarketplacePage } from "@/pages/MarketplacePage";
-import { MarketplaceListingDetailPage } from "@/pages/MarketplaceListingDetailPage";
-import { RestaurantsPage } from "@/pages/RestaurantsPage";
-
 export default function App() {
   return (
     <BrowserRouter>
@@ -17,9 +13,8 @@ export default function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/explorar" element={<PlaceholderPage title="Explorar negocios" />} />
           <Route path="/eventos" element={<PlaceholderPage title="Eventos" />} />
-          <Route path="/marketplace" element={<MarketplacePage />} />
-          <Route path="/restaurantes" element={<RestaurantsPage />} />
-          <Route path="/marketplace/:slug" element={<MarketplaceListingDetailPage />} />
+          <Route path="/marketplace" element={<PlaceholderPage title="Marketplace local" />} />
+          <Route path="/restaurantes" element={<PlaceholderPage title="Restaurantes" />} />
           <Route path="/negocios/nuevo" element={<PlaceholderPage title="Publica tu negocio" />} />
           <Route path="/negocios/:slug" element={<PlaceholderPage title="Detalle de negocio" />} />
           <Route path="/login" element={<LoginPage />} />
