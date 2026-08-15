@@ -164,6 +164,7 @@ model Business {
   whatsapp    String?
   email       String?
   website     String?
+  menuUrl     String?
   avgRating   Float            @default(0)
   reviewCount Int              @default(0)
   createdAt   DateTime         @default(now())
@@ -173,6 +174,7 @@ model Business {
   reviews     Review[]
   gallery     GalleryImage[]
   favorites   Favorite[]
+  hours       BusinessHour[]
 
   @@index([city])
   @@index([category])
@@ -225,6 +227,20 @@ model Favorite {
   @@unique([userId, businessId])
   @@index([businessId])
   @@map("favorites")
+}
+
+model BusinessHour {
+  id         String   @id @default(uuid())
+  businessId String
+  dayOfWeek  Int // 0 (domingo) - 6 (sábado)
+  opensAt    String // "HH:MM" en 24h
+  closesAt   String // "HH:MM" en 24h
+  createdAt  DateTime @default(now())
+
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId])
+  @@map("business_hours")
 }
 
 // ---------------------------------------------------------------
