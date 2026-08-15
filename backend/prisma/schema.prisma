@@ -1,0 +1,316 @@
+// ============================================================
+// La Frontera — schema.prisma
+// Contrato de datos alineado al Diccionario de Datos.
+// PKs UUID, `city` como String, entidades Product/Promotion/Event
+// eliminadas. Incluye User.city y user_interests (login + intereses).
+// ============================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------
+
+enum UserRole {
+  USER
+  BUSINESS_OWNER
+  ADMIN
+}
+
+enum PriceRange {
+  ECONOMICO
+  MODERADO
+  ALTO
+  PREMIUM
+}
+
+enum BusinessStatus {
+  ACTIVE
+  PENDING
+  ARCHIVED
+}
+
+enum BusinessCategory {
+  RESTAURANTE
+  CAFETERIA
+  BAR
+  TIENDA
+  SALUD
+  BELLEZA
+  SERVICIOS_PROFESIONALES
+  ENTRETENIMIENTO
+  HOTEL
+  AUTOMOTRIZ
+  EDUCACION
+  OTRO
+}
+
+enum MarketplaceCategory {
+  VEHICULOS
+  INMUEBLES
+  ELECTRONICA
+  HOGAR_Y_JARDIN
+  EMPLEO
+  SERVICIOS
+  MODA
+  OTRO
+}
+
+enum MarketplaceStatus {
+  ACTIVE
+  SOLD
+  EXPIRED
+  ARCHIVED
+}
+
+enum LaneType {
+  GENERAL
+  SENTRI
+  READY_LANE
+  PEATONAL
+}
+
+enum CrossingStatus {
+  OPEN
+  CLOSED
+  DELAYED
+}
+
+// ---------------------------------------------------------------
+// Core: Usuarios y autenticación
+// ---------------------------------------------------------------
+
+model User {
+  id                String           @id @default(uuid())
+  email             String           @unique
+  passwordHash      String? // null si el usuario entra solo vía Google OAuth
+  googleId          String?          @unique
+  name              String
+  avatarUrl         String?
+  phone             String?
+  role              UserRole         @default(USER)
+  isActive          Boolean          @default(true)
+  city              String
+  favoriteCrossingId String?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  favoriteCrossing  BorderCrossing?  @relation("FavoriteCrossing", fields: [favoriteCrossingId], references: [id])
+  businesses        Business[]       @relation("BusinessOwners")
+  reviews           Review[]
+  favorites         Favorite[]
+  marketplaceAds    MarketplaceListing[]
+  refreshTokens     RefreshToken[]
+  interests         UserInterest[]
+
+  @@index([role])
+  @@index([city])
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  tokenHash String   @unique
+  userId    String
+  expiresAt DateTime
+  revoked   Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("refresh_tokens")
+}
+
+model UserInterest {
+  id        String           @id @default(uuid())
+  userId    String
+  category  BusinessCategory
+  createdAt DateTime         @default(now())
+
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, category])
+  @@index([category])
+  @@map("user_interests")
+}
+
+// ---------------------------------------------------------------
+// Core: Negocios
+// ---------------------------------------------------------------
+
+model Business {
+  id          String           @id @default(uuid())
+  ownerId     String
+  name        String
+  slug        String           @unique
+  description String?
+  category    BusinessCategory
+  status      BusinessStatus   @default(ACTIVE)
+  priceRange  PriceRange       @default(MODERADO)
+  featured    Boolean          @default(false)
+  city        String
+  address     String?
+  latitude    Float?
+  longitude   Float?
+  phone       String?
+  whatsapp    String?
+  email       String?
+  website     String?
+  avgRating   Float            @default(0)
+  reviewCount Int              @default(0)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  owner       User             @relation("BusinessOwners", fields: [ownerId], references: [id])
+  reviews     Review[]
+  gallery     GalleryImage[]
+  favorites   Favorite[]
+
+  @@index([city])
+  @@index([category])
+  @@index([featured])
+  @@index([city, category])
+  @@map("businesses")
+}
+
+model Review {
+  id         String   @id @default(uuid())
+  businessId String
+  userId     String
+  rating     Int // 1-5
+  comment    String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([businessId, userId])
+  @@index([businessId])
+  @@map("reviews")
+}
+
+model GalleryImage {
+  id         String   @id @default(uuid())
+  businessId String
+  url        String
+  caption    String?
+  order      Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId])
+  @@map("gallery_images")
+}
+
+model Favorite {
+  id         String   @id @default(uuid())
+  userId     String
+  businessId String
+  createdAt  DateTime @default(now())
+
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, businessId])
+  @@index([businessId])
+  @@map("favorites")
+}
+
+// ---------------------------------------------------------------
+// Marketplace local (solo contacto, sin chat interno)
+// ---------------------------------------------------------------
+
+model MarketplaceListing {
+  id              String            @id @default(uuid())
+  sellerId        String
+  title           String
+  slug            String            @unique
+  description     String?
+  price           Decimal?          @db.Decimal(10, 2)
+  category        MarketplaceCategory
+  status          MarketplaceStatus @default(ACTIVE)
+  city            String
+  imageUrl        String?
+  contactName     String?
+  contactPhone    String?
+  contactWhatsapp String?
+  contactEmail    String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  seller          User              @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+
+  @@index([city])
+  @@index([category])
+  @@index([city, category])
+  @@map("marketplace_listings")
+}
+
+// ---------------------------------------------------------------
+// Frontera: garitas y tiempos de espera
+// ---------------------------------------------------------------
+
+model BorderCrossing {
+  id               String   @id @default(uuid())
+  portNumber       String   @unique
+  name             String
+  city             String
+  latitude         Float?
+  longitude        Float?
+  hoursOfOperation String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  favoriteBy       User[]          @relation("FavoriteCrossing")
+  waitTimes        WaitTime[]
+  patterns         WaitTimePattern[]
+
+  @@index([city])
+  @@map("border_crossings")
+}
+
+model WaitTime {
+  id                 String         @id @default(uuid())
+  crossingId         String
+  laneType           LaneType
+  waitMinutes        Int
+  lanesOpen          Int?
+  status             CrossingStatus @default(OPEN)
+  constructionNotice String?
+  recordedAt         DateTime
+  createdAt          DateTime       @default(now())
+
+  crossing           BorderCrossing @relation(fields: [crossingId], references: [id], onDelete: Cascade)
+
+  @@index([crossingId, recordedAt])
+  @@index([crossingId, laneType])
+  @@map("wait_times")
+}
+
+model WaitTimePattern {
+  id               String   @id @default(uuid())
+  crossingId       String
+  laneType         LaneType
+  dayOfWeek        Int // 0-6 (domingo-sábado)
+  hourOfDay        Int // 0-23
+  avgWaitMinutes   Float
+  sampleCount      Int      @default(0)
+  lastCalculatedAt DateTime
+
+  crossing         BorderCrossing @relation(fields: [crossingId], references: [id], onDelete: Cascade)
+
+  @@unique([crossingId, laneType, dayOfWeek, hourOfDay])
+  @@index([crossingId])
+  @@map("wait_time_patterns")
+}

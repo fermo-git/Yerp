@@ -1,0 +1,81 @@
+@import "tailwindcss";
+
+/* ------------------------------------------------------------------
+   La Frontera — Design tokens (Tailwind v4, CSS-first)
+   Dirección "La Línea": papel + tinta + verde señal + ámbar (datos vivos).
+   Tipografía: Archivo (variable, display/UI) + IBM Plex Mono (datos).
+------------------------------------------------------------------- */
+@theme {
+  --color-paper: #fbfaf7;
+  --color-ink: #1d1d1f;
+  --color-ink-soft: #6b6b70;
+  --color-verde: #0f5c46;
+  --color-verde-deep: #0a4333;
+  --color-verde-tint: #eef4f1;
+  --color-amber: #e8a13c;
+  --color-amber-deep: #b06a15;
+  --color-amber-tint: #f6e7cd;
+  --color-sand-deep: #dad2be;
+  --color-asphalt: #181a1d;
+  --color-asphalt-soft: #23262b;
+  --color-white: #ffffff;
+
+  --font-display: "Archivo", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Archivo", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-raised: 0 12px 36px -8px rgba(0, 0, 0, 0.14);
+}
+
+@layer base {
+  html {
+    font-family: var(--font-body);
+  }
+  body {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-verde);
+    outline-offset: 2px;
+  }
+  ::selection {
+    background: var(--color-verde);
+    color: #fff;
+  }
+}
+
+@layer components {
+  .container-frontera {
+    margin-inline: auto;
+    width: 100%;
+    max-width: 80rem;
+    padding-inline: 1.25rem;
+  }
+  .font-expanded {
+    font-stretch: 125%;
+  }
+  .font-condensed {
+    font-stretch: 75%;
+  }
+}
+
+@media (min-width: 640px) {
+  .container-frontera {
+    padding-inline: 2rem;
+  }
+}
+
+/* Respeta preferencia de movimiento reducido (WCAG) */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

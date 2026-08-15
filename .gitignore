@@ -1,4 +1,21 @@
-node_modules
-dist
+# Dependencias
+node_modules/
+
+# Variables de entorno (contienen secretos)
 .env
+.env.local
+
+# Builds
+dist/
+build/
+
+# TypeScript
+*.tsbuildinfo
+
+# Logs
+*.log
+npm-debug.log*
+
+# Sistema operativo
 .DS_Store
+Thumbs.db
