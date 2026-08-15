@@ -46,6 +46,7 @@ export function serializeBusiness(b) {
     whatsapp: b.whatsapp,
     email: b.email,
     website: b.website,
+    menuUrl: b.menuUrl ?? null,
     hours: (b.hours ?? []).map((h) => ({
       dayOfWeek: h.dayOfWeek,
       opensAt: h.opensAt,

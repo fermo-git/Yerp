@@ -164,6 +164,7 @@ model Business {
   whatsapp    String?
   email       String?
   website     String?
+  menuUrl     String?
   avgRating   Float            @default(0)
   reviewCount Int              @default(0)
   createdAt   DateTime         @default(now())

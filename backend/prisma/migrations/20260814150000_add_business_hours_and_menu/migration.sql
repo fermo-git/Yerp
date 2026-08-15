@@ -1,3 +1,6 @@
+-- AlterTable
+ALTER TABLE "businesses" ADD COLUMN "menuUrl" TEXT;
+
 -- CreateTable
 CREATE TABLE "business_hours" (
     "id" TEXT NOT NULL,
