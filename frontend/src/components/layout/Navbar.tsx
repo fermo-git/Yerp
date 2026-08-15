@@ -30,7 +30,6 @@ const NAV_LINKS = [
     ),
   },
   {
-  {
     label: "Garitas",
     to: "/garitas",
     icon: icon(
