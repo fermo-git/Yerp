@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { Biznaga } from "@/components/brand/Cactus";
 import { Wordmark } from "@/components/brand/Wordmark";
-import { RouteLine } from "@/components/brand/RouteLine";
 import { CITY_LABELS, type BorderCity } from "@/types/business";
 
 const CITIES = Object.entries(CITY_LABELS) as [BorderCity, string][];
@@ -67,21 +66,6 @@ export function Footer() {
               </li>
             ))}
           </ul>
-        </div>
-      </div>
-
-      {/* Firma: el wordmark atravesado por La Línea */}
-      <div className="border-t border-ink/10">
-        <div className="container-frontera overflow-hidden py-10 sm:py-14">
-          <div className="relative select-none" aria-hidden="true">
-            <p className="whitespace-nowrap text-center font-display font-expanded text-[clamp(2.5rem,9vw,9rem)] font-extrabold uppercase leading-none tracking-[-0.02em] text-ink">
-              La Frontera
-            </p>
-            <RouteLine
-              className="absolute inset-x-0 top-1/2 -translate-y-1/2 bg-ink/20"
-              diamondClassName="bg-white"
-            />
-          </div>
         </div>
       </div>
 
