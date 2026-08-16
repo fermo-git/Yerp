@@ -1,5 +1,9 @@
 # Agent Guide
 
+## Diseño (OBLIGATORIO)
+
+- Toda tarea de UI en `frontend/` DEBE seguir `DESIGN_GUIDE.md` (raíz del repo): dirección «La Línea» (papel + tinta + verde señalética + ámbar para datos vivos), tokens de `frontend/src/index.css`, sistema de radius 8/12/full, cards sin sombra, micro-labels en IBM Plex Mono, cero UI muerta y lista anti-slop. Si una petición contradice la guía, señálalo antes de implementar.
+
 ## Scope
 
 - `frontend/` — React 19 + Vite SPA. `backend/` — Express + Prisma API (auth + negocios: publicar, listar/detalle, reseñas).

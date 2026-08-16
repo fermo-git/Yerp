@@ -185,7 +185,7 @@ export const BORDER_CITIES = [
 ] as const satisfies readonly BorderCity[];
 
 export interface BorderWidgetsSnapshot {
-  exchangeRate: { usdToMxn: number; updatedAt: string };
+  exchangeRate: { usdToMxn: number; changePct?: number; updatedAt: string };
   borderWait: { city: BorderCity; crossingName: string; waitMinutes: number; direction: "NORTE" | "SUR" }[];
   weather: { city: BorderCity; tempC: number; condition: string };
   gasPrice: { city: BorderCity; regularPrice: number; premiumPrice: number };

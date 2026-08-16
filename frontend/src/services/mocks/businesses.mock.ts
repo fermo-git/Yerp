@@ -167,7 +167,7 @@ export const MOCK_RECENT_ACTIVITY: RecentActivityItem[] = [
 ];
 
 export const MOCK_WIDGETS: BorderWidgetsSnapshot = {
-  exchangeRate: { usdToMxn: 18.42, updatedAt: new Date().toISOString() },
+  exchangeRate: { usdToMxn: 18.42, changePct: 0.4, updatedAt: new Date().toISOString() },
   borderWait: [
     { city: "TIJUANA", crossingName: "San Ysidro", waitMinutes: 45, direction: "NORTE" },
     { city: "MEXICALI", crossingName: "Calexico Este", waitMinutes: 20, direction: "NORTE" },

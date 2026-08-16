@@ -19,6 +19,7 @@
   --color-asphalt: #181a1d;
   --color-asphalt-soft: #23262b;
   --color-white: #ffffff;
+  --color-alto: #b3362b;
 
   --font-display: "Archivo", ui-sans-serif, system-ui, sans-serif;
   --font-body: "Archivo", ui-sans-serif, system-ui, sans-serif;
@@ -26,6 +27,9 @@
 
   --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.06);
   --shadow-raised: 0 12px 36px -8px rgba(0, 0, 0, 0.14);
+
+  --duration-fast: 120ms;
+  --duration-med: 200ms;
 }
 
 @layer base {

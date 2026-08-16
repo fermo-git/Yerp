@@ -1,14 +1,23 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import { Saguaro } from "@/components/brand/Cactus";
 import { RouteLine } from "@/components/brand/RouteLine";
 import { PinIcon } from "@/components/brand/Icons";
-import { CITY_OPTIONS } from "@/types/business";
+import { CITY_OPTIONS, type BorderCity } from "@/types/business";
 
 export function Hero() {
-  const [city, setCity] = useState("TIJUANA");
+  const [city, setCity] = useState<BorderCity>("TIJUANA");
   const [query, setQuery] = useState("");
+  const navigate = useNavigate();
+
+  function handleSearch(e: React.FormEvent) {
+    e.preventDefault();
+    const params = new URLSearchParams({ ciudad: city });
+    if (query.trim()) params.set("q", query.trim());
+    navigate(`/explorar?${params.toString()}`);
+  }
 
   return (
     <section className="relative overflow-hidden">
@@ -21,10 +30,7 @@ export function Hero() {
           transition={{ duration: 0.5, ease: "easeOut" }}
           className="flex w-full flex-col items-center"
         >
-       
-
-
-          <h1 className="mt-5 max-w-3xl font-display text-[2.9rem] font-extrabold leading-[1.02] tracking-[-0.02em] text-ink sm:text-6xl lg:text-7xl">
+          <h1 className="mt-5 max-w-4xl font-display font-expanded text-[2.9rem] font-extrabold leading-[1.02] tracking-[-0.02em] text-ink sm:text-6xl lg:text-7xl">
             ¿A dónde vas en la{" "}
             <span className="relative inline-block whitespace-nowrap">
               frontera
@@ -44,14 +50,14 @@ export function Hero() {
           </p>
 
           <form
-            onSubmit={(e) => e.preventDefault()}
+            onSubmit={handleSearch}
             className="mt-9 flex w-full max-w-2xl items-center gap-1 rounded-full border border-ink/10 bg-white p-2 shadow-raised"
           >
             <label className="flex items-center gap-2 rounded-full py-2.5 pl-4 pr-1">
               <PinIcon className="h-4 w-4 shrink-0 text-verde" />
               <select
                 value={city}
-                onChange={(e) => setCity(e.target.value)}
+                onChange={(e) => setCity(e.target.value as BorderCity)}
                 className="appearance-none bg-transparent text-sm font-medium text-ink focus:outline-none"
                 aria-label="Ciudad"
               >
