@@ -78,12 +78,17 @@ export function MarketplacePage() {
               Encuentra artículos, vehículos, servicios y más en tu ciudad fronteriza.
             </p>
           </div>
-          <Button size="lg" onClick={handleOpenModal}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <path d="M12 5v14M5 12h14" />
-            </svg>
-            Publicar
-          </Button>
+          <div className="flex items-center gap-3">
+            <Button size="lg" variant="outline" onClick={() => navigate("/marketplace/mias")}>
+              Mis publicaciones
+            </Button>
+            <Button size="lg" onClick={handleOpenModal}>
+              <svg width="24" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+              Publicar
+            </Button>
+          </div>
         </div>
 
         <div className="mt-8">

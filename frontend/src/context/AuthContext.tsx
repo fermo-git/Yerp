@@ -16,6 +16,7 @@ import type {
   User,
 } from "@/types/user";
 import type { BusinessCategory } from "@/types/business";
+import { queryClient } from "@/lib/queryClient";
 
 type AuthStatus = "loading" | "authenticated" | "unauthenticated";
 
@@ -48,7 +49,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const apply = useCallback((res: AuthResponse) => {
+ const apply = useCallback((res: AuthResponse) => {
+    queryClient.clear();
     setUser(res.user);
     setStatus("authenticated");
     return res;
@@ -71,6 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = useCallback(async () => {
     await authApi.logout();
+    queryClient.clear();
     setUser(null);
     setStatus("unauthenticated");
   }, []);

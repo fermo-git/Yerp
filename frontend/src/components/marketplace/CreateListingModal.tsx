@@ -33,6 +33,8 @@ interface CreateListingModalProps {
   onClose: () => void;
   onSubmit: (input: CreateListingInput) => Promise<void>;
   isSubmitting: boolean;
+  initialValues?: Partial<CreateListingInput>;
+  mode?: "create" | "edit";
 }
 
 export function CreateListingModal({
@@ -40,6 +42,8 @@ export function CreateListingModal({
   onClose,
   onSubmit,
   isSubmitting,
+  initialValues,
+  mode = "create",
 }: CreateListingModalProps) {
   const {
     register,
@@ -63,8 +67,22 @@ export function CreateListingModal({
   });
 
   useEffect(() => {
-    if (open) reset();
-  }, [open, reset]);
+    if (!open) return;
+    reset({
+      title: initialValues?.title ?? "",
+      description: initialValues?.description ?? "",
+      price: initialValues?.price != null ? String(initialValues.price) : "",
+      category: initialValues?.category ?? "",
+      city: initialValues?.city ?? "",
+      imageUrl: initialValues?.imageUrl ?? "",
+      contactName: initialValues?.contactName ?? "",
+      contactPhone: initialValues?.contactPhone ?? "",
+      contactWhatsapp: initialValues?.contactWhatsapp ?? "",
+      contactEmail: initialValues?.contactEmail ?? "",
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, initialValues, reset]);
 
   if (!open) return null;
 
@@ -97,7 +115,7 @@ export function CreateListingModal({
       <div className="relative w-full max-w-lg rounded-3xl bg-white p-7 shadow-raised sm:p-9">
         <div className="flex items-center justify-between">
           <h2 className="font-display text-xl font-bold text-ink">
-            Nueva publicación
+            {mode === "edit" ? "Editar publicación" : "Nueva publicación"}
           </h2>
           <button
             type="button"
@@ -238,7 +256,13 @@ export function CreateListingModal({
               className="flex-1"
               disabled={isSubmitting}
             >
-              {isSubmitting ? "Publicando..." : "Publicar"}
+              {isSubmitting
+                ? mode === "edit"
+                  ? "Guardando..."
+                  : "Publicando..."
+                : mode === "edit"
+                ? "Guardar cambios"
+                : "Publicar"}
             </Button>
           </div>
         </form>
