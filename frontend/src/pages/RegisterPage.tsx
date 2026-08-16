@@ -72,7 +72,7 @@ export function RegisterPage() {
             <h2 className="font-display text-xl font-semibold text-ink">
               ¡Listo, {credentials.name.split(" ")[0]}!
             </h2>
-            <p className="mt-1 text-sm text-ink/55">
+            <p className="mt-1 text-sm text-ink/60">
               Bienvenido a La Frontera en {CITY_LABELS[city]}.
             </p>
           </div>

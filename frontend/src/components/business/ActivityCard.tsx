@@ -4,7 +4,7 @@ import { Rating } from "@/components/ui/Rating";
 
 export function ActivityCard({ item }: { item: RecentActivityItem }) {
   return (
-    <div className="flex flex-col gap-3 rounded-2xl bg-white p-4 shadow-soft">
+    <div className="flex flex-col gap-3 rounded-xl border border-ink/10 bg-white p-4">
       <div className="flex items-center gap-2.5">
         <img src={item.userAvatarUrl} alt="" className="h-8 w-8 rounded-full object-cover" />
         <div className="leading-tight">
@@ -14,7 +14,7 @@ export function ActivityCard({ item }: { item: RecentActivityItem }) {
               {item.action === "REVIEW" ? "escribió una reseña" : "agregó una foto"}
             </span>
           </p>
-          <p className="text-xs text-ink-soft/80">{item.timeAgo}</p>
+          <p className="font-mono text-xs text-ink/60">{item.timeAgo}</p>
         </div>
       </div>
 
@@ -24,7 +24,7 @@ export function ActivityCard({ item }: { item: RecentActivityItem }) {
             src={item.business.coverImageUrl}
             alt={item.business.name}
             loading="lazy"
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
           />
         </div>
       </Link>
