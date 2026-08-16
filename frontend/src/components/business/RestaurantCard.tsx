@@ -14,14 +14,14 @@ interface RestaurantCardProps {
 export function RestaurantCard({ restaurant, isFavorite, onToggleFavorite }: RestaurantCardProps) {
   return (
     <Link to={`/negocios/${restaurant.slug}`} className="group block">
-      <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-ink/5">
+      <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-ink/5">
         <img
           src={restaurant.coverImageUrl}
           alt={restaurant.name}
           loading="lazy"
-          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
         />
-        <span className="absolute left-3 top-3 flex items-center gap-1 rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-ink shadow-soft">
+        <span className="absolute left-3 top-3 flex items-center gap-1 rounded-full border border-ink/10 bg-white px-2.5 py-1 text-xs font-semibold text-ink">
           <svg viewBox="0 0 20 20" className="h-3.5 w-3.5 fill-amber-deep">
             <path d="M10 1.5l2.6 5.3 5.85.85-4.23 4.12 1 5.83L10 14.9l-5.22 2.7 1-5.83L1.55 7.65l5.85-.85L10 1.5z" />
           </svg>
@@ -35,7 +35,7 @@ export function RestaurantCard({ restaurant, isFavorite, onToggleFavorite }: Res
             e.stopPropagation();
             onToggleFavorite(restaurant.slug);
           }}
-          className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white text-ink shadow-soft transition-colors hover:text-verde"
+          className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full border border-ink/10 bg-white text-ink transition-colors hover:text-verde"
         >
           <svg
             width="16"

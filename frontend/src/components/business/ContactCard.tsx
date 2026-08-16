@@ -65,7 +65,7 @@ export function ContactCard({ restaurant }: { restaurant: Business }) {
       : null;
 
   return (
-    <div className="rounded-2xl border border-ink/10 bg-white p-5">
+    <div className="rounded-xl border border-ink/10 bg-white p-5">
       <h2 className="font-display text-lg font-bold text-ink">Contacto</h2>
 
       <div className="mt-4 flex flex-col gap-3.5">

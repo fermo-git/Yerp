@@ -381,7 +381,7 @@ export function NewBusinessForm({
             </Field>
           </div>
 
-          <div className="rounded-2xl border border-ink/10 bg-white p-4">
+          <div className="rounded-xl border border-ink/10 bg-white p-4">
             <label className="flex cursor-pointer items-center gap-2 text-sm font-medium text-ink">
               <input
                 type="checkbox"
@@ -433,7 +433,7 @@ export function NewBusinessForm({
                     </div>
                   );
                 })}
-                {hoursError && <p className="text-xs text-amber-deep">{hoursError}</p>}
+                {hoursError && <p className="text-xs text-alto">{hoursError}</p>}
               </div>
             )}
           </div>
@@ -452,7 +452,7 @@ export function NewBusinessForm({
                   <>
                     <ImageUploader value={field.value} onChange={field.onChange} />
                     {fieldState.error && (
-                      <p className="mt-1.5 text-xs text-amber-deep">{fieldState.error.message}</p>
+                      <p className="mt-1.5 text-xs text-alto">{fieldState.error.message}</p>
                     )}
                   </>
                 )}
@@ -460,7 +460,7 @@ export function NewBusinessForm({
             </div>
           </div>
 
-          <div className="rounded-2xl border border-ink/10 bg-white p-4">
+          <div className="rounded-xl border border-ink/10 bg-white p-4">
             <span className="text-sm font-medium text-ink">Menú</span>
             <span className="ml-2 rounded bg-ink/5 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-ink-soft">
               Opcional
@@ -472,7 +472,7 @@ export function NewBusinessForm({
               {menuFile && (
                 <span className="flex items-center gap-2 text-xs text-ink-soft">
                   {menuFile.name}
-                  <button type="button" onClick={() => setMenuFile(null)} aria-label="Quitar menú" className="text-amber-deep">
+                  <button type="button" onClick={() => setMenuFile(null)} aria-label="Quitar menú" className="text-alto">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M6 6l12 12M18 6L6 18" strokeLinecap="round" />
                     </svg>
@@ -488,13 +488,13 @@ export function NewBusinessForm({
               onChange={(e) => onMenuFile(e.target.files?.[0])}
             />
             <p className="mt-2 text-[11px] text-ink-soft">JPG, PNG, WebP o PDF · máx 10 MB.</p>
-            {menuError && <p className="mt-1 text-xs text-amber-deep">{menuError}</p>}
+            {menuError && <p className="mt-1 text-xs text-alto">{menuError}</p>}
           </div>
         </>
       )}
 
       {rootError && (
-        <div className="rounded-xl border border-amber/40 bg-amber-tint/50 px-4 py-3 text-sm text-amber-deep">
+        <div className="rounded-xl border border-alto/40 bg-white px-4 py-3 text-sm text-alto">
           {rootError}
         </div>
       )}
@@ -506,7 +506,7 @@ export function NewBusinessForm({
       )}
 
       {created && galleryError && (
-        <div className="rounded-xl border border-amber/40 bg-amber-tint/50 px-4 py-3 text-sm text-amber-deep">
+        <div className="rounded-xl border border-alto/40 bg-white px-4 py-3 text-sm text-alto">
           El negocio se creó, pero las imágenes no subieron: {galleryError}. Puedes reintentar abajo.
         </div>
       )}

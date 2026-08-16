@@ -38,13 +38,13 @@ export function MarketplaceCard({ listing }: { listing: MarketplaceListing }) {
 
   return (
     <Link to={`/marketplace/${listing.id}`} className="group block">
-    <article className="flex flex-col overflow-hidden rounded-2xl border border-ink/8 bg-white transition-shadow duration-200 hover:shadow-raised">
+    <article className="flex flex-col overflow-hidden rounded-xl border border-ink/10 bg-white">
       <div className="relative aspect-[4/3] overflow-hidden bg-ink/5">
         <img
           src={listing.imageUrl || PLACEHOLDER_IMG}
           alt={listing.title}
           loading="lazy"
-          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
         />
         <span className="absolute left-3 top-3">
           <Badge tone="verde">
@@ -70,7 +70,7 @@ export function MarketplaceCard({ listing }: { listing: MarketplaceListing }) {
           </p>
         )}
 
-        <div className="mt-auto flex items-center gap-2 pt-3 border-t border-ink/5">
+        <div className="mt-auto flex items-center gap-2 pt-3 border-t border-ink/10">
           <span className="flex h-6 w-6 items-center justify-center overflow-hidden rounded-full bg-verde-tint text-[10px] font-bold text-verde-deep">
             {listing.seller.avatarUrl ? (
               <img
@@ -97,13 +97,13 @@ export function MarketplaceCard({ listing }: { listing: MarketplaceListing }) {
 
 export function MarketplaceCardSkeleton() {
   return (
-    <div className="flex flex-col overflow-hidden rounded-2xl border border-ink/8 bg-white">
+    <div className="flex flex-col overflow-hidden rounded-xl border border-ink/10 bg-white">
       <div className="aspect-[4/3] animate-pulse bg-ink/8" />
       <div className="flex flex-col gap-2.5 p-4">
         <div className="h-4 w-3/4 animate-pulse rounded bg-ink/8" />
         <div className="h-5 w-1/3 animate-pulse rounded bg-ink/8" />
         <div className="h-3.5 w-full animate-pulse rounded bg-ink/8" />
-        <div className="mt-2 flex items-center gap-2 border-t border-ink/5 pt-3">
+        <div className="mt-2 flex items-center gap-2 border-t border-ink/10 pt-3">
           <div className="h-6 w-6 animate-pulse rounded-full bg-ink/8" />
           <div className="h-3 w-20 animate-pulse rounded bg-ink/8" />
         </div>

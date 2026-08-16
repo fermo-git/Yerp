@@ -345,7 +345,7 @@ export function MapPicker({
 
       <div
         ref={containerRef}
-        className="h-64 w-full overflow-hidden rounded-2xl border border-ink/10 bg-ink/5"
+        className="h-64 w-full overflow-hidden rounded-xl border border-ink/10 bg-ink/5"
         aria-label="Mapa para elegir ubicación"
       />
 
@@ -357,7 +357,7 @@ export function MapPicker({
           </svg>
           Usar mi ubicación
         </Button>
-        <span className={cn("text-xs", location ? "text-ink-soft" : "text-amber-deep")}>
+        <span className="text-xs text-ink-soft">
           {busyAll
             ? status ?? "..."
             : location
@@ -365,8 +365,8 @@ export function MapPicker({
               : "Arrastra el pin, busca o usa tu ubicación"}
         </span>
       </div>
-      {status && !busyAll && <p className="text-xs text-amber-deep">{status}</p>}
-      {warn && <p className="text-xs text-amber-deep">{warn}</p>}
+      {status && !busyAll && <p className="text-xs text-alto">{status}</p>}
+      {warn && <p className="text-xs text-alto">{warn}</p>}
       <p className="text-[11px] text-ink-soft">
         Mueve el pin para ajustar la ubicación: la dirección se completa sola. La búsqueda cubre ciudades frontera de México.
       </p>

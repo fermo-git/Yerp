@@ -52,7 +52,7 @@ export function BorderWidgetsStrip() {
   return (
     <section className="container-frontera">
       <Link to="/garitas" className="block">
-        <div className="rounded-2xl bg-asphalt p-6 text-white transition-colors hover:bg-asphalt/95 sm:p-8">
+        <div className="rounded-xl bg-asphalt p-6 text-white transition-colors hover:bg-asphalt/95 sm:p-8">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-2.5">
               <span className="h-2 w-2 rounded-full bg-amber" />

@@ -4,7 +4,7 @@ import { cn } from "@/utils/cn";
 
 export function ReviewCard({ review }: { review: Review }) {
   return (
-    <div className="rounded-2xl border border-ink/10 bg-white p-5">
+    <div className="rounded-xl border border-ink/10 bg-white p-5">
       <div className="flex items-center gap-3">
         {review.user.avatarUrl ? (
           <img

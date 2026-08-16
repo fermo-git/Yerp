@@ -35,7 +35,7 @@ export function ReviewForm({ onSubmit, isSubmitting, submitError }: ReviewFormPr
 
   if (!user) {
     return (
-      <div className="rounded-2xl border border-ink/10 bg-white p-5 text-sm text-ink-soft">
+      <div className="rounded-xl border border-ink/10 bg-white p-5 text-sm text-ink-soft">
         <Link to="/login" className="font-medium text-verde hover:text-verde-deep">
           Inicia sesión
         </Link>{" "}
@@ -50,7 +50,7 @@ export function ReviewForm({ onSubmit, isSubmitting, submitError }: ReviewFormPr
         onSubmit({ rating: values.rating, comment: values.comment.trim() || undefined });
         reset();
       })}
-      className="rounded-2xl border border-ink/10 bg-white p-5"
+      className="rounded-xl border border-ink/10 bg-white p-5"
     >
       <h3 className="font-display text-base font-bold text-ink">Escribe tu reseña</h3>
 
@@ -81,17 +81,17 @@ export function ReviewForm({ onSubmit, isSubmitting, submitError }: ReviewFormPr
           </div>
         )}
       />
-      {errors.rating && <p className="mt-1 text-xs text-amber-deep">{errors.rating.message}</p>}
+      {errors.rating && <p className="mt-1 text-xs text-alto">{errors.rating.message}</p>}
 
       <textarea
         {...register("comment")}
         placeholder="Cuéntanos tu experiencia…"
         rows={3}
-        className="mt-3 w-full rounded-xl border border-ink/10 bg-white px-4 py-3 text-sm text-ink placeholder:text-ink-soft/70 focus:border-verde focus:outline-none focus:ring-2 focus:ring-verde/20"
+        className="mt-3 w-full rounded-md border border-ink/10 bg-white px-4 py-3 text-sm text-ink placeholder:text-ink-soft/70 focus:border-verde focus:outline-none focus:ring-2 focus:ring-verde/20"
       />
-      {errors.comment && <p className="mt-1 text-xs text-amber-deep">{errors.comment.message}</p>}
+      {errors.comment && <p className="mt-1 text-xs text-alto">{errors.comment.message}</p>}
 
-      {submitError && <p className="mt-2 text-xs text-amber-deep">{submitError}</p>}
+      {submitError && <p className="mt-2 text-xs text-alto">{submitError}</p>}
 
       <div className="mt-3 flex justify-end">
         <Button type="submit" size="sm" disabled={isSubmitting}>

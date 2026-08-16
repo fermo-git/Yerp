@@ -13,7 +13,7 @@ export function ReviewList({ reviews, isLoading }: ReviewListProps) {
     return (
       <div className="flex flex-col gap-4">
         {Array.from({ length: 2 }).map((_, i) => (
-          <Skeleton key={i} className="h-32 w-full rounded-2xl" />
+          <Skeleton key={i} className="h-32 w-full rounded-xl" />
         ))}
       </div>
     );

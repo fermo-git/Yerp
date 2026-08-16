@@ -16,7 +16,7 @@ export function HoursTable({ hours }: { hours?: BusinessHours[] }) {
   const today = new Date().getDay();
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-ink/10 bg-white">
+    <div className="overflow-hidden rounded-xl border border-ink/10 bg-white">
       {DAY_LABELS.map((label, day) => {
         const active = day === today;
         return (
@@ -24,7 +24,7 @@ export function HoursTable({ hours }: { hours?: BusinessHours[] }) {
             key={day}
             className={cn(
               "flex items-center justify-between px-4 py-2.5 text-sm",
-              active ? "bg-verde-tint" : "border-t border-ink/5 first:border-t-0"
+              active ? "bg-verde-tint" : "border-t border-ink/10 first:border-t-0"
             )}
           >
             <span className={cn("font-medium", active ? "text-verde-deep" : "text-ink")}>

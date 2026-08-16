@@ -35,7 +35,7 @@ function StarGlyph() {
 
 export function ReviewSummary({ total, avg, counts, selectedStar, onSelectStar }: ReviewSummaryProps) {
   return (
-    <div className="grid gap-8 rounded-2xl border border-ink/10 bg-white p-6 sm:grid-cols-2">
+    <div className="grid gap-8 rounded-xl border border-ink/10 bg-white p-6 sm:grid-cols-2">
       <div>
         <Eyebrow>Calificación general</Eyebrow>
         <div className="mt-3 flex items-center gap-2.5">

@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import type { WaitTime, LaneType } from "@/types/crossing";
@@ -23,11 +22,6 @@ function TrendIcon({ trend }: { trend?: Trend }) {
   return <Minus className="h-4 w-4 text-ink/30" strokeWidth={1.8} />;
 }
 
-const cardVariants = {
-  hidden: { opacity: 0, y: 12 },
-  show: { opacity: 1, y: 0 },
-};
-
 interface LaneStatusCardProps {
   waitTime: WaitTime;
   trend?: Trend;
@@ -39,12 +33,7 @@ export function LaneStatusCard({ waitTime, trend }: LaneStatusCardProps) {
     waitTime.status === "CLOSED" ? "Cerrado" : waitTime.status === "DELAYED" ? "Con demora" : "Abierto";
 
   return (
-    <motion.div
-      variants={cardVariants}
-      whileHover={{ y: -3, boxShadow: "0 8px 20px -8px rgba(0,0,0,0.12)" }}
-      transition={{ type: "spring", stiffness: 220, damping: 22 }}
-      className="flex flex-col gap-2 rounded-lg border border-ink/10 bg-white p-4"
-    >
+    <div className="flex flex-col gap-2 rounded-xl border border-ink/10 bg-white p-4">
       <div className="flex items-center justify-between">
         <span className="text-sm font-medium text-ink/70">{LANE_LABELS[waitTime.laneType]}</span>
         <Badge tone={tone}>{statusLabel}</Badge>
@@ -63,6 +52,6 @@ export function LaneStatusCard({ waitTime, trend }: LaneStatusCardProps) {
       {waitTime.constructionNotice && (
         <p className="text-xs text-amber-deep">{waitTime.constructionNotice}</p>
       )}
-    </motion.div>
+    </div>
   );
 }

@@ -18,7 +18,7 @@ export function RestaurantSearchBar({ value, onChange }: RestaurantSearchBarProp
   }, [input, onChange]);
 
   return (
-    <div className="flex items-center gap-2 rounded-full border border-ink/10 bg-white p-2 shadow-soft">
+    <div className="flex items-center gap-2 rounded-full border border-ink/10 bg-white p-2">
       <span className="pl-3">
         <svg
           viewBox="0 0 24 24"

@@ -134,7 +134,7 @@ export function ImageUploader({
         onDrop={onDrop}
         aria-label="Seleccionar o arrastrar imágenes"
         className={cn(
-          "flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed px-5 py-8 text-center transition-colors",
+          "flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed px-5 py-8 text-center transition-colors",
           dragOver
             ? "border-verde bg-verde-tint"
             : "border-ink/15 bg-white hover:border-verde/50 hover:bg-verde-tint/40"
@@ -181,7 +181,7 @@ export function ImageUploader({
                 type="button"
                 onClick={() => remove(i)}
                 aria-label={`Quitar imagen ${i + 1}`}
-                className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-white/90 text-ink shadow-soft transition-colors hover:text-amber-deep"
+                className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full border border-ink/10 bg-white text-ink transition-colors hover:text-alto"
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
                   <path d="M6 6l12 12M18 6L6 18" strokeLinecap="round" />
@@ -193,10 +193,10 @@ export function ImageUploader({
       )}
 
       <div className="flex items-center justify-between text-xs">
-        <span className={cn("font-medium", value.length === 0 ? "text-amber-deep" : "text-ink-soft")}>
+        <span className="font-medium text-ink-soft">
           {value.length}/{MAX_FILES} seleccionadas
         </span>
-        {error && <span className="text-amber-deep">{error}</span>}
+        {error && <span className="text-alto">{error}</span>}
       </div>
     </div>
   );

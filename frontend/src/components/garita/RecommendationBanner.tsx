@@ -42,9 +42,9 @@ export function RecommendationBanner({
   return (
     <button
       onClick={() => onSelect(fastest.crossing.id)}
-      className="flex w-full items-start gap-3 rounded-lg border border-amber/40 bg-amber-tint p-4 text-left transition-colors hover:bg-amber-tint/70"
+      className="flex w-full items-start gap-3 rounded-xl border border-ink/10 bg-verde-tint p-4 text-left transition-colors hover:bg-verde-tint/70"
     >
-      <Lightbulb className="mt-0.5 h-5 w-5 shrink-0 text-amber-deep" strokeWidth={1.7} />
+      <Lightbulb className="mt-0.5 h-5 w-5 shrink-0 text-verde-deep" strokeWidth={1.7} />
       <p className="text-sm text-ink">
         <span className="font-semibold">Sugerencia:</span> hoy conviene cruzar por{" "}
         <span className="font-semibold">{fastest.crossing.name}</span>. Te ahorrarías

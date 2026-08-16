@@ -8,10 +8,10 @@ import { MARKETPLACE_CATEGORY_OPTIONS } from "@/types/marketplace";
 import type { CreateListingInput } from "@/types/marketplace";
 
 const inputClassName =
-  "w-full rounded-xl border border-ink/10 bg-white px-4 py-3.5 text-sm text-ink placeholder:text-ink-soft/70 focus:border-verde focus:outline-none focus:ring-2 focus:ring-verde/20";
+  "w-full rounded-md border border-ink/10 bg-white px-4 py-3.5 text-sm text-ink placeholder:text-ink-soft/70 focus:border-verde focus:outline-none focus:ring-2 focus:ring-verde/20";
 
 const selectClassName =
-  "w-full rounded-xl border border-ink/10 bg-white px-4 py-3.5 text-sm text-ink focus:border-verde focus:outline-none focus:ring-2 focus:ring-verde/20";
+  "w-full rounded-md border border-ink/10 bg-white px-4 py-3.5 text-sm text-ink focus:border-verde focus:outline-none focus:ring-2 focus:ring-verde/20";
 
 const schema = z.object({
   title: z.string().min(3, "El título debe tener al menos 3 caracteres").max(120, "Máximo 120 caracteres"),
@@ -106,13 +106,13 @@ export function CreateListingModal({
   }
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto bg-ink/40 px-4 py-10 backdrop-blur-sm">
+    <div className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto bg-ink/40 px-4 py-10">
       <div
         className="absolute inset-0"
         onClick={onClose}
         aria-hidden="true"
       />
-      <div className="relative w-full max-w-lg rounded-3xl bg-white p-7 shadow-raised sm:p-9">
+      <div className="relative w-full max-w-lg rounded-xl bg-white p-7 shadow-raised sm:p-9">
         <div className="flex items-center justify-between">
           <h2 className="font-display text-xl font-bold text-ink">
             {mode === "edit" ? "Editar publicación" : "Nueva publicación"}
@@ -194,8 +194,8 @@ export function CreateListingModal({
             />
           </Field>
 
-          <div className="border-t border-ink/8 pt-4">
-            <span className="text-xs font-semibold uppercase tracking-wider text-ink-soft">
+          <div className="border-t border-ink/10 pt-4">
+            <span className="font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-ink-soft">
               Datos de contacto
             </span>
           </div>
@@ -284,7 +284,7 @@ function Field({
     <div className="flex flex-col gap-1.5">
       <span className="text-xs font-medium text-ink/70">{label}</span>
       {children}
-      {error && <p className="text-xs text-amber-deep">{error}</p>}
+      {error && <p className="text-xs text-alto">{error}</p>}
     </div>
   );
 }

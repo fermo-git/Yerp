@@ -51,7 +51,7 @@ export function MyListingCard({
   const isSoldOrArchived = listing.status !== "ACTIVE";
 
   return (
-    <article className="group flex flex-col overflow-hidden rounded-2xl border border-ink/8 bg-white transition-shadow duration-200 hover:shadow-raised sm:flex-row">
+    <article className="group flex flex-col overflow-hidden rounded-xl border border-ink/10 bg-white sm:flex-row">
       <Link
         to={`/marketplace/${listing.id}`}
         className="relative block h-44 shrink-0 overflow-hidden bg-ink/5 sm:h-auto sm:w-48"
@@ -59,7 +59,7 @@ export function MyListingCard({
         <img
           src={listing.imageUrl || PLACEHOLDER_IMG}
           alt={listing.title}
-          className={`h-full w-full object-cover transition-transform duration-300 group-hover:scale-105 ${
+          className={`h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03] ${
             isSoldOrArchived ? "opacity-60 grayscale-[30%]" : ""
           }`}
         />
@@ -93,7 +93,7 @@ export function MyListingCard({
           </p>
         )}
 
-        <div className="mt-auto flex flex-wrap items-center justify-between gap-3 border-t border-ink/5 pt-3">
+        <div className="mt-auto flex flex-wrap items-center justify-between gap-3 border-t border-ink/10 pt-3">
           <span className="text-xs text-ink/40">
             Publicada el {formatDate(listing.createdAt)}
           </span>

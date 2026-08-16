@@ -32,7 +32,7 @@ export function RestaurantHero({
           type="button"
           onClick={() => setLightboxIndex(0)}
           aria-label="Ver foto principal"
-          className="overflow-hidden rounded-2xl sm:col-span-2"
+          className="overflow-hidden rounded-xl sm:col-span-2"
         >
           <img
             src={main}
@@ -48,7 +48,7 @@ export function RestaurantHero({
               type="button"
               onClick={() => setLightboxIndex(i + 1)}
               aria-label={`Ver foto ${i + 2}`}
-              className="overflow-hidden rounded-2xl"
+              className="overflow-hidden rounded-xl"
             >
               <img
                 src={url}
@@ -63,7 +63,7 @@ export function RestaurantHero({
           <button
             type="button"
             onClick={() => setLightboxIndex(0)}
-            className="absolute bottom-3 right-3 flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-ink shadow-soft transition-colors hover:bg-ink/5"
+            className="absolute bottom-3 right-3 flex items-center gap-1.5 rounded-full border border-ink/10 bg-white px-3 py-1.5 text-xs font-semibold text-ink transition-colors hover:bg-ink/5"
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5">
               <rect x="3" y="5" width="18" height="14" rx="2" />

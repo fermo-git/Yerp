@@ -12,10 +12,10 @@ interface CrossingMapProps {
 }
 
 function toneColor(minutes: number | null): string {
-  if (minutes === null) return "#9CA3AF";
-  if (minutes <= 20) return "#2F6B4F"; // verde del sitio
-  if (minutes <= 60) return "#C88A2E"; // amber del sitio
-  return "#B23B3B"; // rojo, crítico
+  if (minutes === null) return "#6b6b70"; // ink-soft
+  if (minutes <= 20) return "#0f5c46"; // verde
+  if (minutes <= 60) return "#e8a13c"; // amber
+  return "#b3362b"; // alto, crítico
 }
 
 function buildIcon(color: string, selected: boolean) {

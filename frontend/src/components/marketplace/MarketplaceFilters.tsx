@@ -36,14 +36,14 @@ export function MarketplaceFilters({
           value={query}
           onChange={(e) => onQueryChange(e.target.value)}
           placeholder="Buscar publicaciones..."
-          className="w-full rounded-xl border border-ink/10 bg-white py-3 pl-10 pr-4 text-sm text-ink placeholder:text-ink-soft/70 focus:border-verde focus:outline-none focus:ring-2 focus:ring-verde/20"
+          className="w-full rounded-md border border-ink/10 bg-white py-3 pl-10 pr-4 text-sm text-ink placeholder:text-ink-soft/70 focus:border-verde focus:outline-none focus:ring-2 focus:ring-verde/20"
         />
       </div>
 
       <select
         value={city}
         onChange={(e) => onCityChange(e.target.value)}
-        className="h-[46px] rounded-xl border border-ink/10 bg-white px-3.5 text-sm font-medium text-ink focus:border-verde focus:outline-none focus:ring-2 focus:ring-verde/20"
+        className="h-[46px] rounded-md border border-ink/10 bg-white px-3.5 text-sm font-medium text-ink focus:border-verde focus:outline-none focus:ring-2 focus:ring-verde/20"
       >
         <option value="">Todas las ciudades</option>
         {CITY_OPTIONS.map((o) => (
@@ -56,7 +56,7 @@ export function MarketplaceFilters({
       <select
         value={category}
         onChange={(e) => onCategoryChange(e.target.value)}
-        className="h-[46px] rounded-xl border border-ink/10 bg-white px-3.5 text-sm font-medium text-ink focus:border-verde focus:outline-none focus:ring-2 focus:ring-verde/20"
+        className="h-[46px] rounded-md border border-ink/10 bg-white px-3.5 text-sm font-medium text-ink focus:border-verde focus:outline-none focus:ring-2 focus:ring-verde/20"
       >
         <option value="">Todas las categorías</option>
         {MARKETPLACE_CATEGORY_OPTIONS.map((o) => (
