@@ -33,6 +33,8 @@ export interface RegisterInput {
   googleId?: string;
   phone?: string;
   city: BorderCity;
+  // El registro solo permite elegir entre USER y BUSINESS_OWNER (nunca ADMIN).
+  role?: "USER" | "BUSINESS_OWNER";
 }
 
 export interface LoginInput {
@@ -49,4 +51,5 @@ export interface UpdateMeInput {
   phone?: string;
   city?: BorderCity;
   avatarUrl?: string;
+  favoriteCrossingId?: string | null;
 }

@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from "react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/Button";
+import { Wordmark } from "@/components/brand/Wordmark";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/utils/cn";
 
@@ -9,7 +10,7 @@ const icon = (children: ReactNode) => (
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    strokeWidth="1.7"
+    strokeWidth="1.8"
     strokeLinecap="round"
     strokeLinejoin="round"
     className="h-[18px] w-[18px]"
@@ -30,6 +31,21 @@ const NAV_LINKS = [
     ),
   },
   {
+    label: "Garitas",
+    to: "/garitas",
+    icon: icon(
+      <>
+        <rect x="4" y="3" width="16" height="18" rx="2" />
+        <path d="M8 8h8M8 12h8M8 16h5" />
+      </>
+    ),
+  },
+  {
+    label: "Restaurantes",
+    to: "/restaurantes",
+    icon: icon(<path d="M5 3v8a2 2 0 0 0 2 2v8M9 3v6M5 3h4M19 3v18M19 3c-2 0-3 2-3 5s1 4 3 4" />),
+  },
+  {
     label: "Marketplace",
     to: "/marketplace",
     icon: icon(
@@ -40,32 +56,21 @@ const NAV_LINKS = [
     ),
   },
   {
-    label: "Negocios",
+    label: "Publica tu negocio",
     to: "/negocios/nuevo",
     icon: icon(<path d="M4 8h16v12H4zM9 8V5a3 3 0 0 1 6 0v3M4 13h16" />),
   },
 ];
 
-function Wordmark() {
-  return (
-    <Link to="/" className="flex items-center gap-2.5" aria-label="La Frontera — inicio">
-      <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-verde text-white">
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-          <path d="M2 10h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-          <rect x="7" y="7" width="6" height="6" rx="1" fill="currentColor" transform="rotate(45 10 10)" />
-        </svg>
-      </span>
-      <span className="font-display text-[15px] font-extrabold uppercase tracking-wide text-ink">
-        La Frontera
-      </span>
-    </Link>
-  );
-}
-
 export function Navbar() {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+
+  const links =
+    user?.role === "BUSINESS_OWNER"
+      ? NAV_LINKS
+      : NAV_LINKS.filter((link) => link.to !== "/negocios/nuevo");
 
   return (
     <header className="sticky top-0 z-50 border-b border-ink/10 bg-paper">
@@ -73,7 +78,7 @@ export function Navbar() {
         <Wordmark />
 
         <nav className="hidden items-center gap-1 lg:flex" aria-label="Navegación principal">
-          {NAV_LINKS.map((link) => (
+          {links.map((link) => (
             <NavLink
               key={link.to}
               to={link.to}
@@ -93,17 +98,6 @@ export function Navbar() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <button
-            type="button"
-            aria-label="Idioma"
-            className="hidden h-10 w-10 items-center justify-center rounded-full text-ink-soft hover:bg-ink/5 hover:text-ink lg:flex"
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
-              <circle cx="12" cy="12" r="9" />
-              <path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18" />
-            </svg>
-          </button>
-
           <div className="hidden items-center gap-1.5 md:flex">
             {user ? (
               <>
@@ -146,7 +140,7 @@ export function Navbar() {
       {open && (
         <div className="border-t border-ink/10 bg-paper lg:hidden">
           <nav className="container-frontera flex flex-col gap-1 py-3" aria-label="Navegación móvil">
-            {NAV_LINKS.map((link) => (
+            {links.map((link) => (
               <NavLink
                 key={link.to}
                 to={link.to}

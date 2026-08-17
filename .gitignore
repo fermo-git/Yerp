@@ -12,6 +12,9 @@ build/
 # TypeScript
 *.tsbuildinfo
 
+# Vite temp files
+*.timestamp-*.mjs
+
 # Logs
 *.log
 npm-debug.log*

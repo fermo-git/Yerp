@@ -1,7 +1,7 @@
 export function StepIndicator({ steps, current }: { steps: string[]; current: number }) {
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.12em] text-ink-soft">
+      <div className="flex items-center justify-between font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-ink-soft">
         <span>{steps[current]}</span>
         <span>
           Paso {current + 1} de {steps.length}

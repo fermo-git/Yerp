@@ -25,7 +25,7 @@ export function Rating({ value, reviewCount, size = "sm", className }: RatingPro
         {value.toFixed(1)}
       </span>
       {typeof reviewCount === "number" && (
-        <span className={cn("text-ink/50", size === "sm" ? "text-xs" : "text-sm")}>
+        <span className={cn("text-ink/60", size === "sm" ? "text-xs" : "text-sm")}>
           ({reviewCount})
         </span>
       )}
