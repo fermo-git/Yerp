@@ -20,15 +20,6 @@ export function PinIcon({ className }: IconProps) {
   );
 }
 
-export function CrossingIcon({ className }: IconProps) {
-  return (
-    <svg viewBox="0 0 20 20" fill="none" className={className} aria-hidden="true">
-      <path d="M2 10h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-      <rect x="7" y="7" width="6" height="6" rx="1" fill="currentColor" transform="rotate(45 10 10)" />
-    </svg>
-  );
-}
-
 export function SunIcon({ className }: IconProps) {
   return (
     <svg
