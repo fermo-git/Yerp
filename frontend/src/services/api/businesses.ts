@@ -1,49 +1,56 @@
 import type {
+  BorderCity,
   Business,
+  BusinessQueryParams,
   RecentActivityItem,
   BorderWidgetsSnapshot,
   CreateBusinessInput,
   CreateBusinessResponse,
   UploadGalleryResponse,
 } from "@/types/business";
-import { MOCK_BUSINESSES, MOCK_RECENT_ACTIVITY, MOCK_WIDGETS } from "@/services/mocks/businesses.mock";
+import { MOCK_RECENT_ACTIVITY, MOCK_WIDGETS } from "@/services/mocks/businesses.mock";
 import { apiClient, mockDelay } from "@/services/api/client";
+import { toBusiness, type ApiBusiness } from "@/lib/businessAdapter";
 
 // -----------------------------------------------------------------
 // Capa de servicios "businesses".
-// Contrato: mismas firmas que tendrá la versión real contra
-// GET /businesses, /businesses/featured, etc. (ver API_ENDPOINTS.md).
-// Para conectar el backend real, reemplazar el cuerpo de cada función
-// por `apiClient.get(...)` — los hooks (hooks/useBusinesses.ts) y los
-// componentes que los consumen no cambian.
+// getBusinesses / getFeaturedBusinesses / getBusinessBySlug consumen la
+// API real (GET /businesses). getRecentActivity y getBorderWidgets siguen
+// leyendo mocks (sin endpoint real todavía).
 // -----------------------------------------------------------------
 
-export async function getFeaturedBusinesses(): Promise<Business[]> {
-  await mockDelay();
-  return MOCK_BUSINESSES.filter((b) => b.featured);
+function buildQuery(params?: BusinessQueryParams): string {
+  const p = new URLSearchParams();
+  if (!params) return "";
+  if (params.city) p.set("city", params.city);
+  if (params.category) p.set("category", params.category);
+  if (params.q?.trim()) p.set("q", params.q.trim());
+  if (params.minRating != null) p.set("minRating", String(params.minRating));
+  if (params.priceRange?.length) p.set("priceRange", params.priceRange.join(","));
+  if (params.sort) p.set("sort", params.sort);
+  if (params.featured) p.set("featured", "true");
+  if (params.limit != null) p.set("limit", String(params.limit));
+  const qs = p.toString();
+  return qs ? `?${qs}` : "";
 }
 
-export async function getBusinesses(params?: {
-  city?: string;
-  category?: string;
-  q?: string;
-}): Promise<Business[]> {
-  await mockDelay();
-  let results = MOCK_BUSINESSES;
-  if (params?.city) results = results.filter((b) => b.city === params.city);
-  if (params?.category) results = results.filter((b) => b.category === params.category);
-  if (params?.q) {
-    const q = params.q.toLowerCase();
-    results = results.filter(
-      (b) => b.name.toLowerCase().includes(q) || b.description.toLowerCase().includes(q)
-    );
-  }
-  return results;
+export async function getFeaturedBusinesses(city?: BorderCity): Promise<Business[]> {
+  return getBusinesses({
+    featured: true,
+    sort: "MEJOR_VALORADOS",
+    limit: 8,
+    ...(city ? { city } : {}),
+  });
 }
 
-export async function getBusinessBySlug(slug: string): Promise<Business | undefined> {
-  await mockDelay();
-  return MOCK_BUSINESSES.find((b) => b.slug === slug);
+export async function getBusinesses(params?: BusinessQueryParams): Promise<Business[]> {
+  const raw = await apiClient.get<ApiBusiness[]>(`/businesses${buildQuery(params)}`);
+  return raw.map(toBusiness);
+}
+
+export async function getBusinessBySlug(slug: string): Promise<Business> {
+  const raw = await apiClient.get<ApiBusiness>(`/businesses/${slug}`);
+  return toBusiness(raw);
 }
 
 export async function getRecentActivity(): Promise<RecentActivityItem[]> {

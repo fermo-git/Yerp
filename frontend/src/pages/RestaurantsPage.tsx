@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useRestaurants, useRestaurantFilters } from "@/hooks/useRestaurants";
-import { RestaurantSearchBar } from "@/components/business/RestaurantSearchBar";
+import { SearchBar } from "@/components/search/SearchBar";
 import { RestaurantFilterBar } from "@/components/business/RestaurantFilterBar";
 import { RestaurantGrid } from "@/components/business/RestaurantGrid";
 import { Eyebrow } from "@/components/ui/Eyebrow";
@@ -62,8 +62,14 @@ export function RestaurantsPage() {
         )}
       </header>
 
-      <div className="mt-8 max-w-2xl">
-        <RestaurantSearchBar value={filters.q} onChange={(q) => setParam("q", q || null)} />
+      <div className="mt-8">
+        <SearchBar
+          variant="compact"
+          showCity={false}
+          city={filters.city ?? "TIJUANA"}
+          initialQuery={filters.q}
+          onSubmit={(q) => setParam("q", q || null)}
+        />
       </div>
 
       <div className="mt-6">

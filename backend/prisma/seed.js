@@ -281,6 +281,239 @@ const restaurants = [
   },
 ];
 
+// ------------------------------------------------------------------
+// Negocios adicionales: completa 10 registros por ciudad fronteriza.
+// No se modifican ni eliminan los registros de `restaurants` de arriba;
+// este bloque solo AÑADE negocios para que cada ciudad tenga 10.
+// ------------------------------------------------------------------
+const slugifySeed = (s) =>
+  s
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+const EXTRA_DESCRIPTIONS = {
+  RESTAURANTE: (name) => `${name} — cocina local con sabor de la frontera y atención familiar.`,
+  CAFETERIA: (name) => `${name} — café de especialidad, pan recién horneado y ambiente tranquilo.`,
+  BAR: (name) => `${name} — bar de ambiente con coctelería y música en vivo.`,
+  TIENDA: (name) => `${name} — tienda local con productos de la región.`,
+  SALUD: (name) => `${name} — atención médica general y de especialidades.`,
+  BELLEZA: (name) => `${name} — salón de belleza y cuidado personal.`,
+  SERVICIOS_PROFESIONALES: (name) => `${name} — servicios profesionales de confianza en la ciudad.`,
+  ENTRETENIMIENTO: (name) => `${name} — entretenimiento y diversión para toda la familia.`,
+  HOTEL: (name) => `${name} — hospedaje cómodo y céntrico para viajeros.`,
+  AUTOMOTRIZ: (name) => `${name} — taller automotriz y refacciones.`,
+  EDUCACION: (name) => `${name} — centro educativo y de capacitación.`,
+  OTRO: (name) => `${name} — negocio local de la frontera.`,
+};
+
+const EXTRA_HOURS = {
+  RESTAURANTE: ["12:00", "22:00"],
+  CAFETERIA: ["07:00", "19:00"],
+  BAR: ["17:00", "02:00"],
+  TIENDA: ["09:00", "20:00"],
+  SALUD: ["09:00", "18:00"],
+  BELLEZA: ["10:00", "19:00"],
+  SERVICIOS_PROFESIONALES: ["09:00", "18:00"],
+  ENTRETENIMIENTO: ["12:00", "23:00"],
+  HOTEL: ["00:00", "23:59"],
+  AUTOMOTRIZ: ["08:00", "18:00"],
+  EDUCACION: ["08:00", "17:00"],
+  OTRO: ["10:00", "18:00"],
+};
+
+const EXTRA_COORDS = {
+  TIJUANA: [32.5283, -117.0187],
+  MEXICALI: [32.6245, -115.4523],
+  CIUDAD_JUAREZ: [31.7386, -106.4859],
+  NUEVO_LAREDO: [27.4871, -99.5112],
+  REYNOSA: [26.0923, -98.2779],
+  MATAMOROS: [25.8756, -97.5083],
+  NOGALES: [31.3017, -110.9377],
+  PIEDRAS_NEGRAS: [28.7014, -100.5263],
+  SAN_LUIS_RIO_COLORADO: [32.4763, -114.7679],
+  AGUA_PRIETA: [31.3291, -109.5498],
+};
+
+const EXTRA_AREA_CODES = {
+  TIJUANA: 664,
+  MEXICALI: 686,
+  CIUDAD_JUAREZ: 656,
+  NUEVO_LAREDO: 867,
+  REYNOSA: 899,
+  MATAMOROS: 868,
+  NOGALES: 631,
+  PIEDRAS_NEGRAS: 878,
+  SAN_LUIS_RIO_COLORADO: 653,
+  AGUA_PRIETA: 633,
+};
+
+// [nombre, categoría, rango de precio]
+const EXTRA_BY_CITY = {
+  TIJUANA: [
+    ["Taquería La Postal", "RESTAURANTE", "ECONOMICO"],
+    ["Café Revolución", "CAFETERIA", "MODERADO"],
+    ["Cervecería Insurgentes", "BAR", "MODERADO"],
+    ["Mercado Hidalgo", "TIENDA", "MODERADO"],
+    ["Farmacia del Centro", "SALUD", "ECONOMICO"],
+    ["Salón Baja Studio", "BELLEZA", "MODERADO"],
+    ["Hotel Colonial Revolución", "HOTEL", "ALTO"],
+    ["Auto Servicio Zona Norte", "AUTOMOTRIZ", "ECONOMICO"],
+  ],
+  MEXICALI: [
+    ["Restaurante La Chinesca", "RESTAURANTE", "MODERADO"],
+    ["Café Cachanilla", "CAFETERIA", "ECONOMICO"],
+    ["Cantina El As de Oro", "BAR", "MODERADO"],
+    ["Boutique Calzada", "TIENDA", "ALTO"],
+    ["Clínica Frontera Salud", "SALUD", "MODERADO"],
+    ["Estética 43", "BELLEZA", "ECONOMICO"],
+    ["Despacho Contable del Valle", "SERVICIOS_PROFESIONALES", "MODERADO"],
+    ["Taller El Camino", "AUTOMOTRIZ", "ECONOMICO"],
+  ],
+  SAN_LUIS_RIO_COLORADO: [
+    ["Mariscos El Delfín", "RESTAURANTE", "MODERADO"],
+    ["Café Sonorense", "CAFETERIA", "ECONOMICO"],
+    ["Bar La Playita", "BAR", "ECONOMICO"],
+    ["Tienda El Valle", "TIENDA", "ECONOMICO"],
+    ["Consultorio Médico del Desierto", "SALUD", "MODERADO"],
+    ["Spa Jardín del Río", "BELLEZA", "ALTO"],
+    ["Hotel Frontera Norte", "HOTEL", "MODERADO"],
+    ["Mecánica Rápida SL", "AUTOMOTRIZ", "ECONOMICO"],
+  ],
+  CIUDAD_JUAREZ: [
+    ["Burritos Don Chuy", "RESTAURANTE", "ECONOMICO"],
+    ["Café Paso del Norte", "CAFETERIA", "MODERADO"],
+    ["Cantina La Juárez", "BAR", "MODERADO"],
+    ["Mercado Pronaf", "TIENDA", "MODERADO"],
+    ["Clínica Médica Chamizal", "SALUD", "MODERADO"],
+    ["Salón Glow", "BELLEZA", "MODERADO"],
+    ["Hotel Villa del Paso", "HOTEL", "MODERADO"],
+    ["Auto Refacciones Puente", "AUTOMOTRIZ", "ECONOMICO"],
+    ["Academia Bilingüe Frontera", "EDUCACION", "MODERADO"],
+  ],
+  NUEVO_LAREDO: [
+    ["Parrillada Los Dos Laredos", "RESTAURANTE", "MODERADO"],
+    ["Café Maclovio", "CAFETERIA", "ECONOMICO"],
+    ["Bar La Calle 15", "BAR", "ECONOMICO"],
+    ["Tienda El Puente", "TIENDA", "ECONOMICO"],
+    ["Farmacia Aduana", "SALUD", "ECONOMICO"],
+    ["Estética La Internacional", "BELLEZA", "MODERADO"],
+    ["Hotel Reforma Plaza", "HOTEL", "ALTO"],
+    ["Llantera La Ribera", "AUTOMOTRIZ", "ECONOMICO"],
+    ["Escuela de Música del Norte", "EDUCACION", "MODERADO"],
+  ],
+  REYNOSA: [
+    ["Taquería El Regio", "RESTAURANTE", "ECONOMICO"],
+    ["Café Del Río Bravo", "CAFETERIA", "MODERADO"],
+    ["Bar La Hidalgo", "BAR", "MODERADO"],
+    ["Plaza Comercial Reynosa", "TIENDA", "MODERADO"],
+    ["Clínica Vital", "SALUD", "MODERADO"],
+    ["Beauty Center Florencia", "BELLEZA", "MODERADO"],
+    ["Hotel Colonial Reynosa", "HOTEL", "MODERADO"],
+    ["Taller Mecánico 2000", "AUTOMOTRIZ", "ECONOMICO"],
+    ["Instituto de Idiomas Frontera", "EDUCACION", "MODERADO"],
+  ],
+  MATAMOROS: [
+    ["Mariscos Playa Bagdad", "RESTAURANTE", "MODERADO"],
+    ["Café El Remolino", "CAFETERIA", "ECONOMICO"],
+    ["Cantina La Bodega", "BAR", "ECONOMICO"],
+    ["Mercado Juárez Matamoros", "TIENDA", "ECONOMICO"],
+    ["Clínica del Valle", "SALUD", "MODERADO"],
+    ["Salón Áurea", "BELLEZA", "MODERADO"],
+    ["Hotel Hacienda del Norte", "HOTEL", "ALTO"],
+    ["Autolavado El Cruce", "AUTOMOTRIZ", "ECONOMICO"],
+    ["Centro de Capacitación Tamaulipas", "EDUCACION", "MODERADO"],
+  ],
+  NOGALES: [
+    ["Sonora Grill Nogales", "RESTAURANTE", "MODERADO"],
+    ["Café del Puerto", "CAFETERIA", "ECONOMICO"],
+    ["Bar La Morley", "BAR", "ECONOMICO"],
+    ["Tienda La Garita", "TIENDA", "ECONOMICO"],
+    ["Clínica Nogales Salud", "SALUD", "MODERADO"],
+    ["Estética Kino", "BELLEZA", "MODERADO"],
+    ["Hotel Frontera Nogales", "HOTEL", "MODERADO"],
+    ["Refaccionaria El Cerro", "AUTOMOTRIZ", "ECONOMICO"],
+    ["Academia de Computación del Norte", "EDUCACION", "MODERADO"],
+  ],
+  PIEDRAS_NEGRAS: [
+    ["Restaurante El Río", "RESTAURANTE", "MODERADO"],
+    ["Café Internacional", "CAFETERIA", "MODERADO"],
+    ["Bar La Ribera", "BAR", "MODERADO"],
+    ["Tienda El Águila", "TIENDA", "ECONOMICO"],
+    ["Clínica del Carbón", "SALUD", "MODERADO"],
+    ["Salón Elite", "BELLEZA", "MODERADO"],
+    ["Hotel Plaza Piedras Negras", "HOTEL", "MODERADO"],
+    ["Taller El Norte", "AUTOMOTRIZ", "ECONOMICO"],
+    ["Escuela de Inglés Eagle Pass", "EDUCACION", "MODERADO"],
+  ],
+  AGUA_PRIETA: [
+    ["Taquería El Cruce", "RESTAURANTE", "ECONOMICO"],
+    ["Café Douglas", "CAFETERIA", "ECONOMICO"],
+    ["Bar La Frontera", "BAR", "ECONOMICO"],
+    ["Tienda Sonora", "TIENDA", "ECONOMICO"],
+    ["Clínica Agua Prieta", "SALUD", "MODERADO"],
+    ["Salón Belleza del Desierto", "BELLEZA", "MODERADO"],
+    ["Hotel Portal del Norte", "HOTEL", "MODERADO"],
+    ["Mecánica El Bordo", "AUTOMOTRIZ", "ECONOMICO"],
+    ["Instituto Técnico Fronterizo", "EDUCACION", "MODERADO"],
+  ],
+};
+
+const EXTRA_COVERS = [A, B, C, D, E, F, G, H, I];
+
+function buildExtraBusinesses() {
+  const usedSlugs = new Set(restaurants.map((r) => r.slug));
+  const extras = [];
+  let idx = 0;
+
+  for (const [city, entries] of Object.entries(EXTRA_BY_CITY)) {
+    entries.forEach(([name, category, priceRange], i) => {
+      let slug = `${slugifySeed(name)}-${slugifySeed(city)}`;
+      let suffix = 1;
+      while (usedSlugs.has(slug)) {
+        suffix += 1;
+        slug = `${slugifySeed(name)}-${slugifySeed(city)}-${suffix}`;
+      }
+      usedSlugs.add(slug);
+
+      const cover = EXTRA_COVERS[idx % EXTRA_COVERS.length];
+      const [baseLat, baseLng] = EXTRA_COORDS[city];
+      const area = EXTRA_AREA_CODES[city];
+      const phone = `+52 ${area} ${String(200 + idx).padStart(3, "0")} ${String(4000 + idx).padStart(4, "0")}`;
+
+      extras.push({
+        slug,
+        name,
+        description: EXTRA_DESCRIPTIONS[category](name),
+        category,
+        priceRange,
+        city,
+        address: `Calle ${110 + i} ${i % 2 ? "Norte" : "Sur"}, Centro`,
+        latitude: baseLat + (i % 5) * 0.004,
+        longitude: baseLng + (i % 3) * 0.003,
+        featured: false,
+        cover,
+        gallery: [
+          cover,
+          EXTRA_COVERS[(idx + 1) % EXTRA_COVERS.length],
+          EXTRA_COVERS[(idx + 2) % EXTRA_COVERS.length],
+        ],
+        hours: week(...EXTRA_HOURS[category]),
+        phone,
+        whatsapp: phone,
+        email: `${slug}@lafrontera.mx`,
+        website: null,
+        createdAt: new Date(Date.UTC(2026, 5, 10) - idx * 3 * 86400000).toISOString(),
+      });
+      idx += 1;
+    });
+  }
+
+  return extras;
+}
+
 const authors = [
   { name: "Vicki L.", avatarUrl: "https://i.pravatar.cc/80?img=47", email: "vicki@example.com" },
   { name: "Caili C.", avatarUrl: "https://i.pravatar.cc/80?img=32", email: "caili@example.com" },
@@ -419,8 +652,10 @@ async function main() {
     authorIds[a.name] = u.id;
   }
 
+  const allBusinesses = [...restaurants, ...buildExtraBusinesses()];
+
   const bySlug = {};
-  for (const r of restaurants) {
+  for (const r of allBusinesses) {
     const b = await prisma.business.create({
       data: {
         ownerId: owner.id,
@@ -475,7 +710,9 @@ async function main() {
     });
   }
 
-  console.log("Seed completado: restaurantes, horarios, galería y reseñas.");
+  console.log(
+    `Seed completado: ${allBusinesses.length} negocios (10 por ciudad), horarios, galería y reseñas.`
+  );
 }
 
 main()

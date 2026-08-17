@@ -67,13 +67,18 @@ export function Navbar() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
 
+  const links =
+    user?.role === "BUSINESS_OWNER"
+      ? NAV_LINKS
+      : NAV_LINKS.filter((link) => link.to !== "/negocios/nuevo");
+
   return (
     <header className="sticky top-0 z-50 border-b border-ink/10 bg-paper">
       <div className="container-frontera flex h-[72px] items-center justify-between gap-4">
         <Wordmark />
 
         <nav className="hidden items-center gap-1 lg:flex" aria-label="Navegación principal">
-          {NAV_LINKS.map((link) => (
+          {links.map((link) => (
             <NavLink
               key={link.to}
               to={link.to}
@@ -135,7 +140,7 @@ export function Navbar() {
       {open && (
         <div className="border-t border-ink/10 bg-paper lg:hidden">
           <nav className="container-frontera flex flex-col gap-1 py-3" aria-label="Navegación móvil">
-            {NAV_LINKS.map((link) => (
+            {links.map((link) => (
               <NavLink
                 key={link.to}
                 to={link.to}

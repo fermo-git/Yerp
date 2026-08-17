@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/Button";
@@ -44,7 +44,10 @@ function ActionCard({
 export function NewBusinessPage() {
   const { user, status } = useAuth();
   const navigate = useNavigate();
-  const [open, setOpen] = useState(false);
+  const location = useLocation();
+  const fromRegister =
+    (location.state as { fromRegister?: boolean } | null)?.fromRegister === true;
+  const [open, setOpen] = useState(fromRegister);
   const [created, setCreated] = useState<BusinessDTO | null>(null);
 
   useEffect(() => {
@@ -59,6 +62,12 @@ export function NewBusinessPage() {
       document.body.style.overflow = "";
     };
   }, [open]);
+
+  // Limpia el estado de navegación para que un refresh no reabra el formulario.
+  useEffect(() => {
+    if (fromRegister) navigate(location.pathname, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (status === "loading") return <Spinner />;
 
@@ -169,7 +178,7 @@ export function NewBusinessPage() {
             >
               <div className="flex items-center justify-between border-b border-ink/10 px-6 py-5">
                 <div>
-                  <h2 className="font-display text-lg font-bold text-ink">Nuevo negocio</h2>
+                  <h2 className="font-display text-lg font-bold text-ink">¡Cuéntanos de tu negocio!</h2>
                   <p className="text-xs text-ink-soft">Algunos campos son opcionales</p>
                 </div>
                 <button

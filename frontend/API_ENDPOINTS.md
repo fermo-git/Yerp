@@ -27,7 +27,7 @@ Base URL: `/api/v1`. Todas las respuestas: `{ data, meta? }` en éxito,
 ## Negocios
 | Método | Ruta | Descripción |
 |---|---|---|
-| GET  | `/businesses` | Listado con filtros (`city`, `category`, `q`, `priceRange`, `featured`) |
+| GET  | `/businesses` | Listado con filtros (`city`, `category`, `q`, `priceRange`, `minRating`, `sort`, `featured=true`, `limit=1..50`) |
 | GET  | `/businesses/featured` | Destacados para la landing |
 | GET  | `/businesses/:slug` | Detalle por slug |
 | POST | `/businesses` | Crear negocio (rol BUSINESS_OWNER) |

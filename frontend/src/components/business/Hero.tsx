@@ -1,29 +1,32 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/Button";
 import { Saguaro } from "@/components/brand/Cactus";
 import { RouteLine } from "@/components/brand/RouteLine";
-import { PinIcon } from "@/components/brand/Icons";
-import { CITY_OPTIONS, type BorderCity } from "@/types/business";
+import { SearchBar } from "@/components/search/SearchBar";
+import { useAuth } from "@/hooks/useAuth";
+import type { BorderCity } from "@/types/business";
 
 export function Hero() {
-  const [city, setCity] = useState<BorderCity>("TIJUANA");
-  const [query, setQuery] = useState("");
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [city, setCity] = useState<BorderCity>(user?.city ?? "TIJUANA");
 
-  function handleSearch(e: React.FormEvent) {
-    e.preventDefault();
-    const params = new URLSearchParams({ ciudad: city });
-    if (query.trim()) params.set("q", query.trim());
+  useEffect(() => {
+    if (user?.city) setCity(user.city);
+  }, [user?.city]);
+
+  function handleSearch(q: string, c: BorderCity) {
+    const params = new URLSearchParams({ ciudad: c });
+    if (q.trim()) params.set("q", q.trim());
     navigate(`/explorar?${params.toString()}`);
   }
 
   return (
-    <section className="relative overflow-hidden">
+    <section className="relative overflow-x-clip">
       <Saguaro className="absolute right-6 top-10 hidden w-28 lg:block xl:right-16" />
 
-      <div className="container-frontera flex flex-col items-center pt-20 pb-20 text-center lg:pt-28 lg:pb-24">
+      <div className="container-frontera flex flex-col items-center pt-20 pb-24 text-center lg:pt-28 lg:pb-32">
         <motion.div
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
@@ -49,37 +52,13 @@ export function Hero() {
             fronterizas de México.
           </p>
 
-          <form
-            onSubmit={handleSearch}
-            className="mt-9 flex w-full max-w-2xl items-center gap-1 rounded-full border border-ink/10 bg-white p-2 shadow-raised"
-          >
-            <label className="flex items-center gap-2 rounded-full py-2.5 pl-4 pr-1">
-              <PinIcon className="h-4 w-4 shrink-0 text-verde" />
-              <select
-                value={city}
-                onChange={(e) => setCity(e.target.value as BorderCity)}
-                className="appearance-none bg-transparent text-sm font-medium text-ink focus:outline-none"
-                aria-label="Ciudad"
-              >
-                {CITY_OPTIONS.map((o) => (
-                  <option key={o.value} value={o.value}>
-                    {o.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <span className="hidden h-6 w-px bg-ink/10 sm:block" />
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              type="text"
-              placeholder="¿Qué buscas?"
-              className="min-w-0 flex-1 bg-transparent px-3 py-2.5 text-sm text-ink placeholder:text-ink-soft/70 focus:outline-none"
+          <div className="mt-9 w-full">
+            <SearchBar
+              city={city}
+              onCityChange={setCity}
+              onSubmit={handleSearch}
             />
-            <Button type="submit" size="lg" className="rounded-full px-6 sm:shrink-0">
-              Buscar
-            </Button>
-          </form>
+          </div>
         </motion.div>
       </div>
 

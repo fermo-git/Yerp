@@ -135,6 +135,7 @@ router.get("/", async (req, res, next) => {
     if (req.query.priceRange) {
       where.priceRange = { in: String(req.query.priceRange).split(",") };
     }
+    if (req.query.featured === "true") where.featured = true;
     const minRating = Number(req.query.minRating);
     if (req.query.minRating && !Number.isNaN(minRating)) {
       where.avgRating = { gte: minRating };
@@ -155,9 +156,15 @@ router.get("/", async (req, res, next) => {
           ? { avgRating: "desc" }
           : { createdAt: "desc" };
 
+    const limitRaw = Number(req.query.limit);
+    const limit = Number.isFinite(limitRaw)
+      ? Math.min(Math.max(Math.trunc(limitRaw), 1), 50)
+      : undefined;
+
     const businesses = await prisma.business.findMany({
       where,
       orderBy,
+      take: limit,
       include: { gallery: { orderBy: { order: "asc" } }, hours: true },
     });
 
