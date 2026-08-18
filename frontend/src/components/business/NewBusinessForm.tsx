@@ -27,7 +27,6 @@ const PHONE_RE = /^[+]?[\d\s().-]{7,}$/;
 const HTML_RE = /[<>]/;
 const CONTROL_RE = /[\x00-\x08\x0b\x0c\x0e-\x1f]/;
 const MAX_IMAGES = 10;
-const MENU_MAX_BYTES = 10 * 1024 * 1024;
 const MENU_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "application/pdf"]);
 
 const STEPS = ["Negocio", "Ubicación", "Contacto y horarios", "Fotos y menú"];
@@ -200,10 +199,6 @@ export function NewBusinessForm({
     if (!f) return;
     if (!MENU_TYPES.has(f.type)) {
       setMenuError("El menú debe ser una imagen (JPG/PNG/WebP) o un PDF.");
-      return;
-    }
-    if (f.size > MENU_MAX_BYTES) {
-      setMenuError("El menú debe pesar máximo 10 MB.");
       return;
     }
     setMenuFile(f);
@@ -443,7 +438,7 @@ export function NewBusinessForm({
       {step === 3 && (
         <>
           <div>
-            <span className="text-xs font-medium text-ink/70">Imágenes (16:9)</span>
+            <span className="text-xs font-medium text-ink/70">Imágenes</span>
             <div className="mt-1.5">
               <Controller
                 control={control}
@@ -487,7 +482,7 @@ export function NewBusinessForm({
               className="hidden"
               onChange={(e) => onMenuFile(e.target.files?.[0])}
             />
-            <p className="mt-2 text-[11px] text-ink-soft">JPG, PNG, WebP o PDF · máx 10 MB.</p>
+            <p className="mt-2 text-[11px] text-ink-soft">JPG, PNG, WebP o PDF.</p>
             {menuError && <p className="mt-1 text-xs text-alto">{menuError}</p>}
           </div>
         </>

@@ -306,7 +306,7 @@ router.post("/:id/reviews", authRequired, async (req, res, next) => {
   }
 });
 
-// POST /businesses/:id/gallery — sube imágenes (máx 10, 16:9). Solo el dueño.
+// POST /businesses/:id/gallery — sube imágenes (máx 10). Solo el dueño.
 router.post(
   "/:id/gallery",
   uploadLimiter,
@@ -418,7 +418,6 @@ export function isMulterError(err) {
 }
 
 export const multerMessages = {
-  LIMIT_FILE_SIZE: "Cada imagen debe pesar máximo 5 MB",
   LIMIT_FILE_COUNT: `Máximo ${MAX_FILES} imágenes por subida`,
   LIMIT_UNEXPECTED_FILE: "Tipo de archivo no permitido",
 };

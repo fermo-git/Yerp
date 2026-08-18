@@ -1,9 +1,9 @@
 // Subida y validación de imágenes de galería.
 // Estrategia defensa-en-profundidad:
-//   1) Multer memoryStorage con límite de tamaño y nº de archivos.
+//   1) Multer memoryStorage con límite de nº de archivos.
 //   2) fileFilter descarta por MIME (primera pasada).
 //   3) detectImage valida los MAGIC BYTES reales del buffer (autoridad).
-//   4) sharp verifica que la imagen decodifique y cumpla 16:9 + tamaño mínimo.
+//   4) sharp verifica que la imagen decodifique.
 //   5) Se re-decodifica con sharp (strip de metadatos/EXIF) y se guarda con
 //      nombre UUID (sin nombre del usuario → evita path traversal).
 import multer from "multer";
@@ -19,7 +19,6 @@ const PUBLIC_BASE_URL =
   process.env.PUBLIC_BASE_URL || `http://localhost:${process.env.PORT || 4000}`;
 
 export const MAX_FILES = 10;
-export const MAX_FILE_BYTES = 5 * 1024 * 1024; // 5 MB
 
 const ALLOWED = {
   "image/jpeg": { ext: "jpg", format: "jpeg", signature: [{ offset: 0, bytes: [0xff, 0xd8, 0xff] }] },
@@ -38,14 +37,9 @@ const ALLOWED = {
   },
 };
 
-const RATIO_TARGET = 16 / 9;
-const RATIO_TOLERANCE = 0.01; // ±1%
-const MIN_WIDTH = 1280;
-const MIN_HEIGHT = 720;
-
 export const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: MAX_FILE_BYTES, files: MAX_FILES },
+  limits: { files: MAX_FILES },
   fileFilter: (_req, file, cb) => {
     if (ALLOWED[file.mimetype]) return cb(null, true);
     cb(new multer.MulterError("LIMIT_UNEXPECTED_FILE"));
@@ -97,16 +91,6 @@ export async function validateAndSaveImage(file) {
   if (!meta.width || !meta.height) {
     throw new ImageValidationError("No se pudieron leer las dimensiones", "INVALID_IMAGE");
   }
-  if (meta.width < MIN_WIDTH || meta.height < MIN_HEIGHT) {
-    throw new ImageValidationError(
-      `Mínimo ${MIN_WIDTH}×${MIN_HEIGHT} (recibido ${meta.width}×${meta.height})`,
-      "IMAGE_TOO_SMALL"
-    );
-  }
-  const ratio = meta.width / meta.height;
-  if (Math.abs(ratio - RATIO_TARGET) > RATIO_TOLERANCE) {
-    throw new ImageValidationError("La imagen debe tener relación de aspecto 16:9", "WRONG_ASPECT_RATIO");
-  }
 
   await mkdir(UPLOAD_DIR, { recursive: true });
   const filename = `${randomUUID()}.${detected.ext}`;
@@ -119,8 +103,6 @@ export async function validateAndSaveImage(file) {
   return { url: `${PUBLIC_BASE_URL}/uploads/${filename}`, width: meta.width, height: meta.height };
 }
 
-export const MENU_MAX_BYTES = 10 * 1024 * 1024; // 10 MB
-
 const MENU_ALLOWED = {
   ...ALLOWED,
   "application/pdf": {
@@ -132,7 +114,7 @@ const MENU_ALLOWED = {
 
 export const menuUpload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: MENU_MAX_BYTES, files: 1 },
+  limits: { files: 1 },
   fileFilter: (_req, file, cb) => {
     if (MENU_ALLOWED[file.mimetype]) return cb(null, true);
     cb(new multer.MulterError("LIMIT_UNEXPECTED_FILE"));
