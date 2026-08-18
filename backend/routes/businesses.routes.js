@@ -237,11 +237,11 @@ router.get("/mine", authRequired, async (req, res, next) => {
   }
 });
 
-// GET /businesses/:slug — detalle
+// GET /businesses/:slug — detalle (solo negocios activos)
 router.get("/:slug", async (req, res, next) => {
   try {
-    const business = await prisma.business.findUnique({
-      where: { slug: req.params.slug },
+    const business = await prisma.business.findFirst({
+      where: { slug: req.params.slug, status: "ACTIVE" },
       include: { gallery: { orderBy: { order: "asc" } }, hours: true },
     });
 

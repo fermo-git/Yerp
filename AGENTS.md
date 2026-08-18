@@ -12,6 +12,7 @@
 ## Database & backend
 
 - PostgreSQL vía Docker: `docker compose up -d` (puerto `5433`, base `lafrontera`). Credenciales en `backend/.env`.
+- Producción con Docker: `docker compose up -d --build` levanta 3 servicios — `db` (PostgreSQL, NO modificar), `api` (`backend/Dockerfile`, node:20-bullseye-slim, corre `prisma migrate deploy` + reintentos al arrancar vía `docker-entrypoint.sh`) y `web` (`frontend/Dockerfile`, build multi-etapa + nginx con SPA fallback y caché de assets). Variables de puertos/URLs en `.env` raíz (ver `.env.example`); secretos del backend en `backend/.env`. Los uploads persisten en el volumen `uploads_data`.
 - Instalar backend: `npm install` desde `backend/`.
 - Migrar/generar: `npm run prisma:generate` y `npm run prisma:migrate` desde `backend/` (apuntan a `backend/prisma/schema.prisma`).
 - Sembrar: `npm run prisma:seed` desde `backend/` (restaurantes + horarios + galería + reseñas; dueño demo `owner@lafrontera.mx` / `demo1234`).
@@ -131,3 +132,43 @@ Página de perfil donde el usuario edita su información personal y puede conver
 - Backend modificados: `backend/routes/users.routes.js` (endpoints `POST /me/upgrade-to-owner` y `POST /me/avatar`).
 - Frontend nuevos: `frontend/src/pages/ProfilePage.tsx`.
 - Frontend modificados: `frontend/src/App.tsx` (ruta `/perfil`), `frontend/src/services/api/auth.ts` (`upgradeToOwner`, `uploadAvatarImage`), `frontend/src/context/AuthContext.tsx` (`upgradeToOwner` en el contexto), `frontend/src/components/layout/Navbar.tsx` (avatar → `/perfil` con `cursor-pointer` en desktop, botón "Mi perfil" en menú móvil), `frontend/src/types/user.ts` (`UpdateMeInput.phone/avatarUrl` aceptan `null`).
+
+## Favoritos de negocios
+
+Favoritos persistentes por usuario, guardados en la tabla `favorites` (userId + businessId, par único). Antes vivían en `useState` local y se perdían al refrescar; ahora se sincronizan con el perfil.
+
+### Backend (`backend/routes/users.routes.js`, todos bajo `authRequired`)
+- `GET /users/me/favorites` — lista los negocios favoritos del usuario (galería + horarios incluidos, serializados con `serializeBusiness`), ordenados por fecha desc.
+- `PUT /users/me/favorites/:businessId` — agrega favorito con `upsert` (idempotente); 404 si el negocio no existe.
+- `DELETE /users/me/favorites/:businessId` — quita favorito con `deleteMany` (idempotente). Sin rate limit (consistente con reseñas). No requiere migraciones (la tabla ya existe).
+
+### Frontend
+- `services/api/favorites.ts`: `getMyFavorites()` (normaliza con `toBusiness`), `addFavorite(businessId)`, `removeFavorite(businessId)`.
+- `hooks/useFavorites.ts`: `useFavorites()` (query `["favorites","mine"]`, solo habilitada autenticado) y `useToggleFavorite()` (mutation con optimistic update + rollback en error + invalidación al terminar).
+- `RestaurantsPage` y `RestaurantDetailPage` leen el estado real de favoritos (Set de slugs derivado con `useMemo`); sin sesión el toggle redirige a `/login`. El filtro "Solo favoritos" sigue siendo client-side sobre la lista cargada.
+- `ProfilePage` muestra la sección "Tus favoritos" (eyebrow "Guardados"): skeletons, `EmptyState` con CTA a `/explorar` y grid de `BusinessCard` (2/3/4 cols).
+- El estado "es favorito" NO viaja en los endpoints públicos de negocios: se fusiona en el cliente con la query de favoritos.
+
+## Panel de administración (`/admin`)
+
+Sección separada solo para rol `ADMIN`. Sin Navbar/Footer públicos: `layouts/AdminLayout.tsx` con sidebar propio (Dashboard / Negocios / Reseñas / Usuarios). Ruta protegida por `components/admin/AdminRoute.tsx` (sin sesión → `/login`; rol ≠ `ADMIN` → aviso sin permisos; carga → spinner).
+
+### Backend (`backend/routes/admin.routes.js`, montado en `/api/v1/admin`)
+- Todas bajo `authRequired` + `requireRole("ADMIN")`.
+- `GET /admin/stats` — KPIs (usuarios, negocios por estado, reseñas, marketplace) + últimos 5 negocios, reseñas y usuarios.
+- `GET /admin/businesses` — todos los negocios (incluye archivados) con filtros `city`, `category`, `status`, `q` y dueño embebido.
+- `PATCH /admin/businesses/:id` — solo `status` (`ACTIVE`/`ARCHIVED`) y/o `featured` (whitelist, sin edición libre).
+- `DELETE /admin/businesses/:id` — elimina el negocio (cascade a reseñas/galería/horarios/favoritos).
+- `GET /admin/reviews` — reseñas con filtros `q` (autor/negocio/comentario) y `rating`, tope 100.
+- `DELETE /admin/reviews/:id` — elimina la reseña y recalcula `avgRating`/`reviewCount` del negocio.
+- `GET /admin/users` — usuarios con filtros `q`, `role`, `city`, tope 100, con nº de negocios.
+- `PATCH /admin/users/:id` — cambiar `role` (`USER`/`BUSINESS_OWNER`, whitelist estricta, **nunca ADMIN**; rechaza si el objetivo es `ADMIN`) y/o `isActive`.
+- Ajuste: `GET /businesses/:slug` ahora solo devuelve negocios `status: "ACTIVE"` (un archivado desaparece de la vista pública).
+
+### Frontend
+- `services/api/admin.ts` (tipos + métodos), `hooks/useAdmin.ts` (queries con `placeholderData` + mutations que invalidan por sección).
+- Páginas en `pages/admin/`: `AdminDashboardPage` (StatCards + actividad reciente), `AdminBusinessesPage` (filtros + destacar/archivar/eliminar), `AdminReviewsPage` (filtros + eliminar), `AdminUsersPage` (cambiar rol/activar-desactivar; protege cuenta propia y admins).
+- Componentes en `components/admin/`: `StatCard` (valores en Plex Mono tabular, `alert` para ámbar), `ConfirmDialog`, `AdminRoute`, `AdminPageHeader` (eyebrow + título + descripción + `RouteLine`, usado por las 4 páginas).
+- `AdminLayout`: sidebar blanco con wordmark (`Wordmark`), iconos de navegación, tarjeta del usuario (avatar + badge "Admin") y acciones "Ver sitio"/"Cerrar sesión"; activo = `bg-verde-tint`. El dashboard muestra 3 listados de actividad reciente (negocios, reseñas, usuarios recientes).
+- `Navbar`: link "Admin" solo visible con `role === "ADMIN"` (desktop y móvil).
+- Roles `ADMIN` no se asignan desde el cliente: se configuran directamente en BD.

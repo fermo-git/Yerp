@@ -2,11 +2,13 @@ import { useBusinesses } from "@/hooks/useBusinesses";
 import { useExploreFilters } from "@/hooks/useExploreFilters";
 import { SearchBar } from "@/components/search/SearchBar";
 import { BusinessCard } from "@/components/business/BusinessCard";
+import { FilterStrip, type FilterStripItem } from "@/components/business/FilterStrip";
 import { BusinessCardSkeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { Button } from "@/components/ui/Button";
 import { Select, type SelectOption } from "@/components/ui/Select";
+import { ALL_CATEGORIES_ICON, CATEGORY_ICONS } from "@/lib/categoryIcons";
 import {
   BUSINESS_CATEGORIES,
   CATEGORY_LABELS,
@@ -15,9 +17,13 @@ import {
   type BusinessSort,
 } from "@/types/business";
 
-const CATEGORY_OPTIONS: SelectOption[] = [
-  { value: "", label: "Todas las categorías" },
-  ...BUSINESS_CATEGORIES.map((c) => ({ value: c, label: CATEGORY_LABELS[c] })),
+const CATEGORY_ITEMS: FilterStripItem[] = [
+  { value: "", label: "Todo", icon: ALL_CATEGORIES_ICON },
+  ...BUSINESS_CATEGORIES.map((c) => ({
+    value: c,
+    label: CATEGORY_LABELS[c],
+    icon: CATEGORY_ICONS[c],
+  })),
 ];
 
 const SORT_OPTIONS: SelectOption[] = [
@@ -64,13 +70,19 @@ export function ExplorePage() {
         />
       </div>
 
-      <div className="mt-6 flex flex-wrap items-center gap-2">
-        <Select
+      <div className="mt-6">
+        <FilterStrip
+          items={CATEGORY_ITEMS}
           value={filters.category ?? ""}
-          options={CATEGORY_OPTIONS}
           onChange={(v) => setParam("categoria", v || null)}
-          ariaLabel="Categoría"
+          ariaLabel="Categorías"
         />
+      </div>
+
+      <div className="mt-4 flex flex-wrap items-center gap-2">
+        <p className="text-sm text-ink-soft">
+          {isFetching && !isLoading ? "Buscando…" : countLabel}
+        </p>
         <div className="ml-auto">
           <Select
             value={filters.sort ?? "NOVEDADES"}
@@ -81,10 +93,6 @@ export function ExplorePage() {
           />
         </div>
       </div>
-
-      <p className="mt-6 text-sm text-ink-soft">
-        {isFetching && !isLoading ? "Buscando…" : countLabel}
-      </p>
 
       <div className="mt-5">
         {isLoading && (

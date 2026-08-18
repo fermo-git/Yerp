@@ -3,7 +3,7 @@ import { z } from "zod";
 import rateLimit from "express-rate-limit";
 import { prisma } from "../lib/prisma.js";
 import { authRequired } from "../lib/auth.js";
-import { serializeUser } from "../lib/serialize.js";
+import { serializeUser, serializeBusiness } from "../lib/serialize.js";
 import { upload, validateAndSaveImage, ImageValidationError } from "../lib/upload.js";
 
 const BUSINESS_CATEGORIES = [
@@ -152,6 +152,61 @@ router.get("/me/interests", async (req, res, next) => {
   try {
     const user = await serializeUser(req.userId);
     return res.json({ data: { interests: user?.interests ?? [] } });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /users/me/favorites — negocios favoritos del usuario (auth).
+router.get("/me/favorites", async (req, res, next) => {
+  try {
+    const favorites = await prisma.favorite.findMany({
+      where: { userId: req.userId },
+      orderBy: { createdAt: "desc" },
+      include: {
+        business: {
+          include: { gallery: { orderBy: { order: "asc" } }, hours: true },
+        },
+      },
+    });
+    return res.json({ data: favorites.map((f) => serializeBusiness(f.business)) });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// PUT /users/me/favorites/:businessId — agrega un favorito (idempotente).
+router.put("/me/favorites/:businessId", async (req, res, next) => {
+  try {
+    const business = await prisma.business.findUnique({
+      where: { id: req.params.businessId },
+      select: { id: true },
+    });
+    if (!business) {
+      return res.status(404).json({
+        error: { code: "NOT_FOUND", message: "Negocio no encontrado" },
+      });
+    }
+    await prisma.favorite.upsert({
+      where: {
+        userId_businessId: { userId: req.userId, businessId: business.id },
+      },
+      update: {},
+      create: { userId: req.userId, businessId: business.id },
+    });
+    return res.json({ data: { favorited: true } });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// DELETE /users/me/favorites/:businessId — quita un favorito (idempotente).
+router.delete("/me/favorites/:businessId", async (req, res, next) => {
+  try {
+    await prisma.favorite.deleteMany({
+      where: { userId: req.userId, businessId: req.params.businessId },
+    });
+    return res.json({ data: { favorited: false } });
   } catch (err) {
     next(err);
   }

@@ -60,6 +60,16 @@ const NAV_LINKS = [
     to: "/negocios/nuevo",
     icon: icon(<path d="M4 8h16v12H4zM9 8V5a3 3 0 0 1 6 0v3M4 13h16" />),
   },
+  {
+    label: "Admin",
+    to: "/admin",
+    icon: icon(
+      <>
+        <circle cx="12" cy="12" r="3" />
+        <path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1" />
+      </>
+    ),
+  },
 ];
 
 export function Navbar() {
@@ -67,10 +77,14 @@ export function Navbar() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
 
-  const links =
-    user?.role === "BUSINESS_OWNER"
-      ? NAV_LINKS
-      : NAV_LINKS.filter((link) => link.to !== "/negocios/nuevo");
+  const links = NAV_LINKS.filter(
+    (link) =>
+      link.to === "/admin"
+        ? user?.role === "ADMIN"
+        : link.to === "/negocios/nuevo"
+          ? user?.role === "BUSINESS_OWNER"
+          : true
+  );
 
   return (
     <header className="sticky top-0 z-50 border-b border-ink/10 bg-paper">

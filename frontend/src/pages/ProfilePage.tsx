@@ -4,11 +4,15 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useAuth } from "@/hooks/useAuth";
+import { useFavorites } from "@/hooks/useFavorites";
 import { Field, inputClassName } from "@/components/auth/Field";
 import { Button } from "@/components/ui/Button";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Badge } from "@/components/ui/Badge";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { BusinessCard } from "@/components/business/BusinessCard";
+import { BusinessCardSkeleton } from "@/components/ui/Skeleton";
 import { CITY_OPTIONS, CITY_LABELS, type BorderCity } from "@/types/business";
 import type { UserRole } from "@/types/user";
 import { uploadAvatarImage } from "@/services/api/auth";
@@ -35,6 +39,7 @@ type UpgradeState = "idle" | "pending" | "success" | "error";
 export function ProfilePage() {
   const { user, status, updateMe, upgradeToOwner } = useAuth();
   const navigate = useNavigate();
+  const { data: favorites, isLoading: favoritesLoading } = useFavorites();
 
   const [saved, setSaved] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -331,6 +336,43 @@ export function ProfilePage() {
                 </>
               )}
             </div>
+          </div>
+        </div>
+
+        <div className="mt-12">
+          <Eyebrow>Guardados</Eyebrow>
+          <h2 className="mt-2 font-display text-2xl font-bold tracking-tight text-ink">
+            Tus favoritos
+          </h2>
+
+          <div className="mt-5">
+            {favoritesLoading && (
+              <div className="grid grid-cols-2 gap-x-5 gap-y-8 sm:grid-cols-3 lg:grid-cols-4">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <BusinessCardSkeleton key={i} />
+                ))}
+              </div>
+            )}
+
+            {!favoritesLoading && (favorites?.length ?? 0) === 0 && (
+              <EmptyState
+                title="Aún no tienes favoritos"
+                description="Toca el corazón en cualquier restaurante o negocio para guardarlo aquí."
+                action={
+                  <Button variant="outline" onClick={() => navigate("/explorar")}>
+                    Explorar negocios
+                  </Button>
+                }
+              />
+            )}
+
+            {!favoritesLoading && (favorites?.length ?? 0) > 0 && (
+              <div className="grid grid-cols-2 gap-x-5 gap-y-8 sm:grid-cols-3 lg:grid-cols-4">
+                {favorites?.map((b) => (
+                  <BusinessCard key={b.id} business={b} />
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </section>

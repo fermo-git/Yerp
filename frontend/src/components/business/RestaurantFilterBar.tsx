@@ -1,17 +1,15 @@
 import type {
-  BorderCity,
   PriceRange,
   RestaurantFilters,
   RestaurantSort,
 } from "@/types/business";
-import { CITY_OPTIONS, PRICE_RANGE_LABELS } from "@/types/business";
+import { PRICE_RANGE_LABELS } from "@/types/business";
 import { Select, type SelectOption } from "@/components/ui/Select";
 import { cn } from "@/utils/cn";
 
 interface RestaurantFilterBarProps {
   filters: RestaurantFilters;
   isAuthenticated: boolean;
-  onCityChange: (city: BorderCity) => void;
   onRatingChange: (rating: number | null) => void;
   onPriceToggle: (price: PriceRange) => void;
   onFavoritesChange: (value: boolean) => void;
@@ -79,23 +77,6 @@ const SORT_OPTIONS: SelectOption[] = [
   { value: "MEJOR_VALORADOS", label: "Mejor valorados" },
 ];
 
-function PinIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="h-4 w-4 text-verde"
-    >
-      <path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0z" />
-      <circle cx="12" cy="10" r="3" />
-    </svg>
-  );
-}
-
 function SortIcon() {
   return (
     <svg
@@ -131,27 +112,13 @@ function HeartIcon({ filled }: { filled: boolean }) {
 export function RestaurantFilterBar({
   filters,
   isAuthenticated,
-  onCityChange,
   onRatingChange,
   onPriceToggle,
   onFavoritesChange,
   onSortChange,
 }: RestaurantFilterBarProps) {
-  const cityOptions: SelectOption[] = CITY_OPTIONS.map((o) => ({
-    value: o.value,
-    label: o.label,
-  }));
-
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <Select
-        value={filters.city ?? ""}
-        options={cityOptions}
-        onChange={(v) => onCityChange(v as BorderCity)}
-        icon={<PinIcon />}
-        ariaLabel="Ubicación"
-      />
-
       <Select
         value={filters.rating == null ? "" : String(filters.rating)}
         options={RATING_OPTIONS}
