@@ -48,8 +48,8 @@ export interface GoogleLoginInput {
 
 export interface UpdateMeInput {
   name?: string;
-  phone?: string;
+  phone?: string | null;
   city?: BorderCity;
-  avatarUrl?: string;
+  avatarUrl?: string | null;
   favoriteCrossingId?: string | null;
 }

@@ -617,6 +617,220 @@ const CROSSINGS = [
   { portNumber: "535503", name: "Brownsville - Los Indios", city: "MATAMOROS", latitude: 26.0459, longitude: -97.7275, hoursOfOperation: null },
   { portNumber: "535504", name: "Brownsville - Gateway", city: "MATAMOROS", latitude: 25.9026, longitude: -97.4864, hoursOfOperation: "24 hrs/día" },
 ];
+const MARKETPLACE_LISTINGS = [
+  // --- TIJUANA ---
+  {
+    title: "Honda Civic 2019 — un solo dueño",
+    description: "Honda Civic EX 2019, automático, 45,000 km, servicio de agencia, placas BC. Impecable, sin detalles.",
+    price: 285000,
+    category: "VEHICULOS",
+    city: "TIJUANA",
+    imageUrl: "https://images.unsplash.com/photo-1549317661-bd32c8ce0637?q=80&w=800&auto=format&fit=crop",
+    seller: "Marco T.",
+    contactPhone: "+52 664 100 2001",
+  },
+  {
+    title: "iPhone 15 Pro 256GB — nuevo en caja",
+    description: "iPhone 15 Pro 256GB color titanio natural, sellado en caja, con factura y garantía Apple México.",
+    price: 22500,
+    category: "ELECTRONICA",
+    city: "TIJUANA",
+    imageUrl: "https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?q=80&w=800&auto=format&fit=crop",
+    seller: "Lucía R.",
+    contactPhone: "+52 664 100 2002",
+  },
+  // --- MEXICALI ---
+  {
+    title: "Sofá seccional gris — como nuevo",
+    description: "Sofá seccional en L color gris Oxford, tela antimanchas, 2 años de uso cuidadoso. Se entrega en Mexicali.",
+    price: 8500,
+    category: "HOGAR_Y_JARDIN",
+    city: "MEXICALI",
+    imageUrl: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?q=80&w=800&auto=format&fit=crop",
+    seller: "Diana P.",
+    contactPhone: "+52 686 100 3001",
+  },
+  {
+    title: "Ropa de marca — lote de 20 prendas",
+    description: "Lote de ropa de marca (Zara, H&M, Forever 21), tallas M-L, excelente estado. Ideal para reventa o tianguis.",
+    price: 3500,
+    category: "MODA",
+    city: "MEXICALI",
+    imageUrl: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=800&auto=format&fit=crop",
+    seller: "Sofía V.",
+    contactPhone: "+52 686 100 3002",
+  },
+  // --- SAN_LUIS_RIO_COLORADO ---
+  {
+    title: "Casa en renta — 3 recámaras, centro",
+    description: "Casa en renta en el centro de San Luis, 3 recámaras, 2 baños, estacionamiento para 2 autos. $12,000/mes.",
+    price: 12000,
+    category: "INMUEBLES",
+    city: "SAN_LUIS_RIO_COLORADO",
+    imageUrl: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=800&auto=format&fit=crop",
+    seller: "Gerardo F.",
+    contactPhone: "+52 653 100 4001",
+  },
+  {
+    title: "Juego de herramientas Craftsman — 150 piezas",
+    description: "Set completo Craftsman 150 piezas: llaves, dados, destornilladores, extensiones. Estuche incluido, poco uso.",
+    price: 4200,
+    category: "OTRO",
+    city: "SAN_LUIS_RIO_COLORADO",
+    imageUrl: "https://images.unsplash.com/photo-1581147036324-c17ac41f0aeb?q=80&w=800&auto=format&fit=crop",
+    seller: "Roberto C.",
+    contactPhone: "+52 653 100 4002",
+  },
+  // --- CIUDAD_JUAREZ ---
+  {
+    title: "Bicicleta de montaña Trek Marlin 7",
+    description: "Trek Marlin 7 rodada 29, cuadro M, frenos hidráulicos Shimano, rodada menos de 500 km. Con candado incluido.",
+    price: 14500,
+    category: "VEHICULOS",
+    city: "CIUDAD_JUAREZ",
+    imageUrl: "https://images.unsplash.com/photo-1485965120184-e2208e0b6914?q=80&w=800&auto=format&fit=crop",
+    seller: "Andrés M.",
+    contactPhone: "+52 656 100 5001",
+  },
+  {
+    title: "Servicio de limpieza profesional — casas y oficinas",
+    description: "Servicio de limpieza profunda para casas y oficinas en Juárez. Personal capacitado, productos incluidos. Cotización sin compromiso.",
+    price: 800,
+    category: "SERVICIOS",
+    city: "CIUDAD_JUAREZ",
+    imageUrl: "https://images.unsplash.com/photo-1521791136064-7986c292016d?q=80&w=800&auto=format&fit=crop",
+    seller: "Fernanda O.",
+    contactPhone: "+52 656 100 5002",
+  },
+  // --- NUEVO_LAREDO ---
+  {
+    title: "Smart TV Samsung 55\" 4K — 2024",
+    description: "Samsung Crystal UHD 55\" modelo 2024, Smart TV, 3 meses de uso, con control remoto y caja original.",
+    price: 9800,
+    category: "ELECTRONICA",
+    city: "NUEVO_LAREDO",
+    imageUrl: "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?q=80&w=800&auto=format&fit=crop",
+    seller: "Hugo M.",
+    contactPhone: "+52 867 100 6001",
+  },
+  {
+    title: "Set de jardín — mesa y 4 sillas de aluminio",
+    description: "Mesa rectangular de aluminio con cubierta de vidrio templado y 4 sillas acojinadas. Ideal para terraza o patio.",
+    price: 6500,
+    category: "HOGAR_Y_JARDIN",
+    city: "NUEVO_LAREDO",
+    imageUrl: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?q=80&w=800&auto=format&fit=crop",
+    seller: "Paola N.",
+    contactPhone: "+52 867 100 6002",
+  },
+  // --- REYNOSA ---
+  {
+    title: "MacBook Air M2 2023 — 16GB RAM",
+    description: "MacBook Air M2 2023, 16GB RAM, 512GB SSD, color midnight. 98% de salud de batería, con cargador original.",
+    price: 24000,
+    category: "ELECTRONICA",
+    city: "REYNOSA",
+    imageUrl: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=800&auto=format&fit=crop",
+    seller: "Tomás G.",
+    contactPhone: "+52 899 100 7001",
+  },
+  {
+    title: "Se solicita auxiliar administrativo — tiempo completo",
+    description: "Empresa de logística busca auxiliar administrativo. Prestaciones de ley, horario L-V 9-18. Enviar CV por correo.",
+    price: 15000,
+    category: "EMPLEO",
+    city: "REYNOSA",
+    imageUrl: "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=800&auto=format&fit=crop",
+    seller: "Claudia R.",
+    contactPhone: "+52 899 100 7002",
+    contactEmail: "empleo@logisticareynosa.mx",
+  },
+  // --- MATAMOROS ---
+  {
+    title: "Refacciones para Nissan Sentra 2018-2022",
+    description: "Lote de refacciones: faros delanteros, defensa, espejos laterales. Originales Nissan, nuevo en caja.",
+    price: 7500,
+    category: "VEHICULOS",
+    city: "MATAMOROS",
+    imageUrl: "https://images.unsplash.com/photo-1486262715619-67b85e4b06a2?q=80&w=800&auto=format&fit=crop",
+    seller: "Jorge H.",
+    contactPhone: "+52 868 100 8001",
+  },
+  {
+    title: "Departamento amueblado — 2 recámaras, zona centro",
+    description: "Departamento amueblado en renta, 2 recámaras, sala, comedor, cocina integral. Incluye agua y gas. Cerca del tec.",
+    price: 9500,
+    category: "INMUEBLES",
+    city: "MATAMOROS",
+    imageUrl: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=800&auto=format&fit=crop",
+    seller: "Mónica A.",
+    contactPhone: "+52 868 100 8002",
+  },
+  // --- NOGALES ---
+  {
+    title: "Tenis Nike Air Max 90 — talla 28 MX",
+    description: "Nike Air Max 90 blancos/negros, talla 28 MX (US 10), usados 2 veces, con caja original. Precio negociable.",
+    price: 1800,
+    category: "MODA",
+    city: "NOGALES",
+    imageUrl: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=800&auto=format&fit=crop",
+    seller: "Raúl D.",
+    contactPhone: "+52 631 100 9001",
+  },
+  {
+    title: "Refrigerador Whirlpool — 2 puertas, funcionando",
+    description: "Refrigerador Whirlpool 2 puertas, 14 pies cúbicos, color inoxidable. Funcionando perfectamente, se vende por mudanza.",
+    price: 5500,
+    category: "HOGAR_Y_JARDIN",
+    city: "NOGALES",
+    imageUrl: "https://images.unsplash.com/photo-1585771724684-38269d6639fd?q=80&w=800&auto=format&fit=crop",
+    seller: "Beatriz L.",
+    contactPhone: "+52 631 100 9002",
+  },
+  // --- PIEDRAS_NEGRAS ---
+  {
+    title: "PC gamer — Ryzen 7, RTX 4060, 32GB RAM",
+    description: "PC armada: Ryzen 7 5800X, RTX 4060 8GB, 32GB DDR4, SSD 1TB, gabinete con RGB. Lista para jugar y trabajar.",
+    price: 18500,
+    category: "ELECTRONICA",
+    city: "PIEDRAS_NEGRAS",
+    imageUrl: "https://images.unsplash.com/photo-1587831990711-23ca6441447b?q=80&w=800&auto=format&fit=crop",
+    seller: "Elena S.",
+    contactPhone: "+52 878 101 0001",
+  },
+  {
+    title: "Clases de inglés — todos los niveles",
+    description: "Profesora certificada TOEFL ofrece clases de inglés presencial y en línea. Grupos reducidos, material incluido.",
+    price: 2500,
+    category: "SERVICIOS",
+    city: "PIEDRAS_NEGRAS",
+    imageUrl: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=800&auto=format&fit=crop",
+    seller: "Vicki L.",
+    contactPhone: "+52 878 101 0002",
+  },
+  // --- AGUA_PRIETA ---
+  {
+    title: "Motocicleta Italika FT150 — 2023",
+    description: "Italika FT150 modelo 2023, 3,000 km, servicio al día, casco y candado incluidos. Papeles en regla.",
+    price: 28000,
+    category: "VEHICULOS",
+    city: "AGUA_PRIETA",
+    imageUrl: "https://images.unsplash.com/photo-1558981806-ec527fa84c39?q=80&w=800&auto=format&fit=crop",
+    seller: "Caili C.",
+    contactPhone: "+52 633 101 1001",
+  },
+  {
+    title: "Vestidos de fiesta — lote de 5, tallas S-M",
+    description: "5 vestidos de fiesta (cortos y largos), tallas S-M, usados una sola vez. Colores variados, excelente calidad.",
+    price: 2800,
+    category: "MODA",
+    city: "AGUA_PRIETA",
+    imageUrl: "https://images.unsplash.com/photo-1496747611176-843222e1e57c?q=80&w=800&auto=format&fit=crop",
+    seller: "Rebecca G.",
+    contactPhone: "+52 633 101 1002",
+  },
+];
+
 async function main() {
   for (const crossing of CROSSINGS) {
     await prisma.borderCrossing.upsert({
@@ -710,8 +924,42 @@ async function main() {
     });
   }
 
+  // --- Marketplace: 2 publicaciones por ciudad ---
+  await prisma.marketplaceListing.deleteMany({});
+
+  let mpCreated = 0;
+  for (const ml of MARKETPLACE_LISTINGS) {
+    const sellerId = authorIds[ml.seller];
+    if (!sellerId) {
+      console.warn(`Seller "${ml.seller}" no encontrado, omitiendo "${ml.title}"`);
+      continue;
+    }
+    let slug = slugifySeed(ml.title);
+    let suffix = 1;
+    while (await prisma.marketplaceListing.findUnique({ where: { slug } })) {
+      slug = `${slugifySeed(ml.title)}-${suffix++}`;
+    }
+    await prisma.marketplaceListing.create({
+      data: {
+        sellerId,
+        title: ml.title,
+        slug,
+        description: ml.description,
+        price: ml.price,
+        category: ml.category,
+        city: ml.city,
+        imageUrl: ml.imageUrl,
+        contactName: ml.seller,
+        contactPhone: ml.contactPhone,
+        contactWhatsapp: ml.contactPhone,
+        contactEmail: ml.contactEmail || null,
+      },
+    });
+    mpCreated += 1;
+  }
+
   console.log(
-    `Seed completado: ${allBusinesses.length} negocios (10 por ciudad), horarios, galería y reseñas.`
+    `Seed completado: ${allBusinesses.length} negocios, ${mpCreated} publicaciones de marketplace, horarios, galería y reseñas.`
   );
 }
 

@@ -97,3 +97,37 @@ Funcionalidad: desde la pestaña "Negocios" (`/negocios/nuevo`, antes placeholde
 ### Notas
 - Las imágenes y el menú se sirven en `http://localhost:4000/uploads/<uuid>.<ext>` (`express.static`); en producción conviene un bucket/CDN. `PUBLIC_BASE_URL` (en `backend/.env`) controla la base de las URLs; `helmet` se configura con `crossOriginResourcePolicy: cross-origin` para permitir cargarlas desde el frontend (5173).
 - El `slug` lo genera el backend (`lib/slug.js`, sin acentos + sufijo aleatorio si colisiona); `status` por defecto `ACTIVE`; `featured`, `avgRating`, `reviewCount` y `ownerId` nunca los manda el cliente (`ownerId` sale de `req.userId`).
+
+## Marketplace — Subida de imagen de publicación
+
+El formulario de marketplace (`CreateListingModal`) permite subir una foto del artículo desde el dispositivo (drag & drop o selector de archivos) en lugar de pegar una URL.
+
+### Flujo
+- `POST /marketplace/images` (auth + rate limit 30/15min, Multer `single("image")`) valida magic bytes + sharp, guarda con UUID en `uploads/`, devuelve `{ url }`. No escribe en BD.
+- El cliente sube la imagen primero (`uploadMarketplaceImage` → `useUploadMarketplaceImage`), luego crea/edita la publicación con la URL devuelta en `imageUrl`. Si la subida falla, el modal permanece abierto con banner de error y el usuario puede reintentar sin duplicar la publicación.
+- En modo edición, el modal muestra la imagen actual como preview; si el usuario sube una nueva, reemplaza `imageUrl` en el PATCH.
+- `ListingImageField` (`components/marketplace/ListingImageField.tsx`) es el componente de subida (1 imagen, validación de tipo en cliente, preview, botón quitar).
+
+### Archivos
+- Backend modificados: `backend/routes/marketplace.routes.js` (endpoint `POST /images`, rate limiter, imports de `lib/upload.js`).
+- Frontend nuevos: `frontend/src/components/marketplace/ListingImageField.tsx`.
+- Frontend modificados: `frontend/src/components/marketplace/CreateListingModal.tsx` (uploader + banner de error + nueva firma `onSubmit(input, imageFile)`), `frontend/src/pages/MarketplacePage.tsx` (orquestación upload → create), `frontend/src/pages/MyMarketplaceListingsPage.tsx` (orquestación upload → patch), `frontend/src/services/api/marketplace.ts` (`uploadMarketplaceImage`), `frontend/src/hooks/useMarketplace.ts` (`useUploadMarketplaceImage`).
+
+## Perfil de usuario (`/perfil`)
+
+Página de perfil donde el usuario edita su información personal y puede convertir su cuenta en dueño de negocio.
+
+### Edición de información personal
+- Formulario con `name`, `phone` y `city` (select de `CITY_OPTIONS`) → `PATCH /users/me` (endpoint ya existente). `phone` acepta `null` para limpiarse (`UpdateMeInput` refleja eso). `email`, `role`, `interests`, `isActive` y `createdAt` son solo lectura en la UI.
+- Foto de perfil: subida de archivo (JPG/PNG/WebP) en lugar de URL. `POST /users/me/avatar` (en `backend/routes/users.routes.js`, auth + rate limit 30/15min, Multer `single("avatar")`, magic bytes + sharp, UUID en `uploads/`) devuelve `{ url }` sin escribir en BD; la página persiste la URL con `updateMe({ avatarUrl: url })`, lo que actualiza el `user` en contexto (y el avatar del Navbar al instante). El círculo del avatar pulsa mientras sube; errores con `role="alert"`.
+- Guardado con `updateMe` del `AuthContext` (actualiza el `user` en contexto). Banners: éxito verde-tint, error `alto` con `role="alert"`.
+
+### Conversión a BUSINESS_OWNER
+- `POST /users/me/upgrade-to-owner` (en `backend/routes/users.routes.js`): endpoint de un solo propósito, SIN body (no hay mass assignment) y nunca permite `ADMIN`. `USER` → `BUSINESS_OWNER`; si ya es dueño responde el usuario sin cambios (idempotente); `ADMIN` recibe 403.
+- Frontend: `upgradeToOwner` en `services/api/auth.ts` + método homónimo en `AuthContext` (actualiza `user.role`). Al actualizarse el rol, el `Navbar` muestra "Publica tu negocio" automáticamente (ya está condicionado a `role === "BUSINESS_OWNER"`).
+- UX: botón "Convertirme en dueño de negocio" en la card lateral abre un modal (`role="dialog"`) con 3 estados — `pending` (espera con pulso), `success` (check + botón "Publicar mi negocio" → `/negocios/nuevo`) y `error` (reintentar/cerrar). El modal no se cierra con clic fuera mientras está en `pending`.
+
+### Archivos
+- Backend modificados: `backend/routes/users.routes.js` (endpoints `POST /me/upgrade-to-owner` y `POST /me/avatar`).
+- Frontend nuevos: `frontend/src/pages/ProfilePage.tsx`.
+- Frontend modificados: `frontend/src/App.tsx` (ruta `/perfil`), `frontend/src/services/api/auth.ts` (`upgradeToOwner`, `uploadAvatarImage`), `frontend/src/context/AuthContext.tsx` (`upgradeToOwner` en el contexto), `frontend/src/components/layout/Navbar.tsx` (avatar → `/perfil` con `cursor-pointer` en desktop, botón "Mi perfil" en menú móvil), `frontend/src/types/user.ts` (`UpdateMeInput.phone/avatarUrl` aceptan `null`).

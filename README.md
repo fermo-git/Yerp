@@ -123,6 +123,7 @@ El módulo de marketplace permite a usuarios autenticados publicar artículos pa
 - Filtros por ciudad, categoría y búsqueda de texto
 - Vista de detalle con imagen grande, descripción completa y datos de contacto del vendedor
 - Creación de publicaciones (requiere autenticación)
+- Subida de imagen del artículo desde el dispositivo (drag & drop, 1 imagen JPG/PNG/WebP, validación magic bytes + sharp)
 - Campos del formulario alineados al schema de base de datos
 
 **Rutas:**

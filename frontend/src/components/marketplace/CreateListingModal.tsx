@@ -1,8 +1,9 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "@/components/ui/Button";
+import { ListingImageField } from "@/components/marketplace/ListingImageField";
 import { CITY_OPTIONS } from "@/types/business";
 import { MARKETPLACE_CATEGORY_OPTIONS } from "@/types/marketplace";
 import type { CreateListingInput } from "@/types/marketplace";
@@ -19,7 +20,6 @@ const schema = z.object({
   price: z.string().optional(),
   category: z.string().min(1, "Elige una categoría"),
   city: z.string().min(1, "Elige una ciudad"),
-  imageUrl: z.string().optional(),
   contactName: z.string().max(100).optional(),
   contactPhone: z.string().max(20).optional(),
   contactWhatsapp: z.string().max(20).optional(),
@@ -31,10 +31,11 @@ type FormValues = z.infer<typeof schema>;
 interface CreateListingModalProps {
   open: boolean;
   onClose: () => void;
-  onSubmit: (input: CreateListingInput) => Promise<void>;
+  onSubmit: (input: CreateListingInput, imageFile: File | null) => Promise<void>;
   isSubmitting: boolean;
   initialValues?: Partial<CreateListingInput>;
   mode?: "create" | "edit";
+  error?: string | null;
 }
 
 export function CreateListingModal({
@@ -44,6 +45,7 @@ export function CreateListingModal({
   isSubmitting,
   initialValues,
   mode = "create",
+  error,
 }: CreateListingModalProps) {
   const {
     register,
@@ -58,13 +60,14 @@ export function CreateListingModal({
       price: "",
       category: "",
       city: "",
-      imageUrl: "",
       contactName: "",
       contactPhone: "",
       contactWhatsapp: "",
       contactEmail: "",
     },
   });
+
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -74,12 +77,12 @@ export function CreateListingModal({
       price: initialValues?.price != null ? String(initialValues.price) : "",
       category: initialValues?.category ?? "",
       city: initialValues?.city ?? "",
-      imageUrl: initialValues?.imageUrl ?? "",
       contactName: initialValues?.contactName ?? "",
       contactPhone: initialValues?.contactPhone ?? "",
       contactWhatsapp: initialValues?.contactWhatsapp ?? "",
       contactEmail: initialValues?.contactEmail ?? "",
     });
+    setImageFile(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, initialValues, reset]);
@@ -96,13 +99,12 @@ export function CreateListingModal({
       city: values.city,
       description: emptyToNull(values.description),
       price: priceNum !== null && !isNaN(priceNum) && priceNum >= 0 ? priceNum : null,
-      imageUrl: emptyToNull(values.imageUrl),
       contactName: emptyToNull(values.contactName),
       contactPhone: emptyToNull(values.contactPhone),
       contactWhatsapp: emptyToNull(values.contactWhatsapp),
       contactEmail: emptyToNull(values.contactEmail),
     };
-    await onSubmit(input);
+    await onSubmit(input, imageFile);
   }
 
   return (
@@ -185,12 +187,11 @@ export function CreateListingModal({
             </select>
           </Field>
 
-          <Field label="URL de imagen" error={errors.imageUrl?.message}>
-            <input
-              type="url"
-              className={inputClassName}
-              placeholder="https://ejemplo.com/imagen.jpg"
-              {...register("imageUrl")}
+          <Field label="Foto del artículo">
+            <ListingImageField
+              value={imageFile}
+              onChange={setImageFile}
+              currentImageUrl={mode === "edit" ? initialValues?.imageUrl : null}
             />
           </Field>
 
@@ -239,6 +240,15 @@ export function CreateListingModal({
               />
             </Field>
           </div>
+
+          {error && (
+            <div
+              role="alert"
+              className="rounded-xl border border-alto/40 bg-white px-4 py-3 text-sm text-alto"
+            >
+              {error}
+            </div>
+          )}
 
           <div className="mt-2 flex gap-3">
             <Button

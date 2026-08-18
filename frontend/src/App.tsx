@@ -12,6 +12,7 @@ import { RestaurantsPage } from "@/pages/RestaurantsPage";
 import { RestaurantDetailPage } from "@/pages/RestaurantDetailPage";
 import { NewBusinessPage } from "@/pages/NewBusinessPage";
 import { MyMarketplaceListingsPage } from "@/pages/MyMarketplaceListingsPage";
+import { ProfilePage } from "@/pages/ProfilePage";
 
 export default function App() {
   return (
@@ -30,6 +31,7 @@ export default function App() {
           <Route path="/negocios/:slug" element={<RestaurantDetailPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/registro" element={<RegisterPage />} />
+          <Route path="/perfil" element={<ProfilePage />} />
         </Route>
       </Routes>
     </BrowserRouter>

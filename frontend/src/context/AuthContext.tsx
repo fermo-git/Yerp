@@ -29,6 +29,7 @@ interface AuthContextValue {
   logout: () => Promise<void>;
   updateMe: (input: UpdateMeInput) => Promise<void>;
   setInterests: (categories: BusinessCategory[]) => Promise<void>;
+  upgradeToOwner: () => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextValue | null>(null);
@@ -88,6 +89,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser((prev) => (prev ? { ...prev, interests: categories } : prev));
   }, []);
 
+  const upgradeToOwner = useCallback(async () => {
+    const u = await authApi.upgradeToOwner();
+    if (u) setUser(u);
+  }, []);
+
   const value = useMemo(
     () => ({
       user,
@@ -98,8 +104,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       logout,
       updateMe,
       setInterests,
+      upgradeToOwner,
     }),
-    [user, status, login, register, loginWithGoogle, logout, updateMe, setInterests]
+    [user, status, login, register, loginWithGoogle, logout, updateMe, setInterests, upgradeToOwner]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

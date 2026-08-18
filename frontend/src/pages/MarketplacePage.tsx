@@ -4,6 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import {
   useCreateMarketplaceListing,
   useMarketplaceListings,
+  useUploadMarketplaceImage,
 } from "@/hooks/useMarketplace";
 import { MarketplaceCard, MarketplaceCardSkeleton } from "@/components/marketplace/MarketplaceCard";
 import { MarketplaceFilters } from "@/components/marketplace/MarketplaceFilters";
@@ -32,6 +33,8 @@ export function MarketplacePage() {
 
   const { data, isLoading, isError } = useMarketplaceListings(filters);
   const createMutation = useCreateMarketplaceListing();
+  const uploadImage = useUploadMarketplaceImage();
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const handleCityChange = useCallback((v: string) => {
     setCity(v);
@@ -56,9 +59,18 @@ export function MarketplacePage() {
     setModalOpen(true);
   }
 
-  async function handleCreateListing(input: CreateListingInput) {
-    await createMutation.mutateAsync(input);
-    setModalOpen(false);
+  async function handleCreateListing(input: CreateListingInput, imageFile: File | null) {
+    setSubmitError(null);
+    try {
+      let imageUrl: string | null = null;
+      if (imageFile) imageUrl = await uploadImage.mutateAsync(imageFile);
+      await createMutation.mutateAsync({ ...input, imageUrl });
+      setModalOpen(false);
+    } catch (err) {
+      setSubmitError(
+        err instanceof Error ? err.message : "No se pudo publicar. Intenta de nuevo."
+      );
+    }
   }
 
   const listings = data?.listings ?? [];
@@ -198,9 +210,13 @@ export function MarketplacePage() {
 
       <CreateListingModal
         open={modalOpen}
-        onClose={() => setModalOpen(false)}
+        onClose={() => {
+          setModalOpen(false);
+          setSubmitError(null);
+        }}
         onSubmit={handleCreateListing}
-        isSubmitting={createMutation.isPending}
+        isSubmitting={createMutation.isPending || uploadImage.isPending}
+        error={submitError}
       />
     </>
   );

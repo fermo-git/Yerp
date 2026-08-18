@@ -20,6 +20,8 @@ Base URL: `/api/v1`. Todas las respuestas: `{ data, meta? }` en éxito,
 | PATCH | `/users/me` | Editar perfil propio (`name`, `phone`, `city`, `avatarUrl`) |
 | GET  | `/users/me/interests` | Intereses del usuario (array de `BusinessCategory`) |
 | PUT  | `/users/me/interests` | Reemplaza intereses. Body: `{ categories: BusinessCategory[] }` |
+| POST | `/users/me/upgrade-to-owner` | Promueve `USER` → `BUSINESS_OWNER` (sin body; nunca permite `ADMIN`). Responde `{ user }` |
+| POST | `/users/me/avatar` | Sube foto de perfil (auth + rate limit). Multipart campo `"avatar"` (1 archivo JPG/PNG/WebP). Valida magic bytes + sharp, guarda con UUID en `uploads/`. Responde `{ url }` (el cliente persiste con `PATCH /users/me`) |
 | GET  | `/users/me/favorites` | Favoritos del usuario |
 | POST | `/users/me/favorites/:businessId` | Marcar favorito |
 | DELETE | `/users/me/favorites/:businessId` | Quitar favorito |
@@ -46,6 +48,7 @@ Base URL: `/api/v1`. Todas las respuestas: `{ data, meta? }` en éxito,
 | GET  | `/marketplace` | Listado con filtros (`city`, `category`, `q`) y paginación (`page`, `limit` default 20). Responde `{ listings, meta: { page, limit, total, totalPages } }` |
 | GET  | `/marketplace/:id` | Detalle de anuncio por ID. Incluye info del vendedor |
 | POST | `/marketplace` | Crear anuncio (requiere auth). Body: `{ title, description?, price?, category, city, imageUrl?, contactName?, contactPhone?, contactWhatsapp?, contactEmail? }` |
+| POST | `/marketplace/images` | Subir imagen de publicación (requiere auth). Multipart campo `"image"` (1 archivo JPG/PNG/WebP). Valida magic bytes + sharp, guarda con UUID en `uploads/`. Responde `{ url }`. |
 | PATCH | `/marketplace/:id` | Editar anuncio propio (requiere auth + ser el dueño) |
 | DELETE | `/marketplace/:id` | Eliminar anuncio propio (requiere auth + ser el dueño) |
 

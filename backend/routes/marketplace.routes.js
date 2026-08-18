@@ -1,7 +1,9 @@
 import { Router } from "express";
 import { z } from "zod";
+import rateLimit from "express-rate-limit";
 import { prisma } from "../lib/prisma.js";
 import { authRequired } from "../lib/auth.js";
+import { upload, validateAndSaveImage, ImageValidationError } from "../lib/upload.js";
 
 const MARKETPLACE_CATEGORIES = [
   "VEHICULOS",
@@ -17,6 +19,14 @@ const MARKETPLACE_CATEGORIES = [
 const MARKETPLACE_STATUSES = ["ACTIVE", "SOLD", "EXPIRED", "ARCHIVED"];
 
 const router = Router();
+
+const uploadLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: { code: "RATE_LIMIT", message: "Demasiadas subidas, intenta más tarde" } },
+});
 
 function slugify(text) {
   return text
@@ -254,6 +264,34 @@ router.post("/", authRequired, async (req, res, next) => {
         },
       },
     });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// POST /marketplace/images — sube UNA imagen (multipart, campo "image") y
+// devuelve su URL pública. No escribe en BD: el cliente manda la URL devuelta
+// en `imageUrl` al crear/editar la publicación. Misma validación que la
+// galería de negocios (magic bytes + sharp + nombre UUID en uploads/).
+router.post("/images", uploadLimiter, authRequired, upload.single("image"), async (req, res, next) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        error: { code: "NO_FILE", message: "Selecciona una imagen" },
+      });
+    }
+    let result;
+    try {
+      result = await validateAndSaveImage(req.file);
+    } catch (err) {
+      if (err instanceof ImageValidationError) {
+        return res.status(400).json({
+          error: { code: err.code, message: `${req.file.originalname}: ${err.message}` },
+        });
+      }
+      throw err;
+    }
+    return res.status(201).json({ data: { url: result.url } });
   } catch (err) {
     next(err);
   }
