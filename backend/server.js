@@ -15,6 +15,7 @@ import { recalculatePatterns } from "./services/patternAggregation.js";
 import contextRoutes from "./routes/context.routes.js";
 import businessRoutes, { isMulterError, multerMessages } from "./routes/businesses.routes.js";
 import geoRoutes from "./routes/geo.routes.js";
+import adminRoutes from "./routes/admin.routes.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const UPLOAD_DIR = path.resolve(__dirname, "uploads");
@@ -40,6 +41,7 @@ app.use("/api/v1/crossings", crossingsRoutes);
 app.use("/api/v1/context", contextRoutes);
 app.use("/api/v1/businesses", businessRoutes);
 app.use("/api/v1/geo", geoRoutes);
+app.use("/api/v1/admin", adminRoutes);
 
 app.use((_req, res) => {
   res.status(404).json({ error: { code: "NOT_FOUND", message: "Ruta no encontrada" } });

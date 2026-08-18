@@ -12,6 +12,7 @@ export function CategoryPill({ label, icon, active, onClick }: CategoryPillProps
     <button
       type="button"
       onClick={onClick}
+      aria-pressed={active}
       className={cn(
         "flex shrink-0 flex-col items-center gap-1.5 border-b-2 px-1 pb-3 pt-1 text-sm font-medium transition-colors",
         active

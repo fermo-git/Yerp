@@ -7,6 +7,7 @@ import {
   getMyMarketplaceListings,
   updateMarketplaceListingStatus,
   updateMarketplaceListing,
+  uploadMarketplaceImage,
 } from "@/services/api/marketplace";
 import type {
   CreateListingInput,
@@ -79,5 +80,13 @@ export function useUpdateMarketplaceListing() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["marketplace"] });
     },
+  });
+}
+
+// No invalida queries: la subida no modifica el anuncio por sí sola; la URL
+// devuelta se persiste con create/update, que sí invalidan ["marketplace"].
+export function useUploadMarketplaceImage() {
+  return useMutation({
+    mutationFn: (file: File) => uploadMarketplaceImage(file),
   });
 }

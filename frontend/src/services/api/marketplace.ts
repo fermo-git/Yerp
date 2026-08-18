@@ -75,3 +75,14 @@ export async function updateMarketplaceListing(
 export async function deleteMarketplaceListing(id: string): Promise<void> {
   await apiClient.delete<{ ok: true }>(`/marketplace/${id}`);
 }
+
+/**
+ * Sube UNA imagen de publicación (multipart, campo "image") y devuelve la URL
+ * pública. La URL se manda después en `imageUrl` al crear/editar el anuncio.
+ */
+export async function uploadMarketplaceImage(file: File): Promise<string> {
+  const form = new FormData();
+  form.append("image", file, file.name);
+  const { url } = await apiClient.upload<{ url: string }>("/marketplace/images", form);
+  return url;
+}

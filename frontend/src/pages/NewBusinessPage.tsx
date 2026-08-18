@@ -2,8 +2,11 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
+import { useMyBusinesses } from "@/hooks/useBusinesses";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { BusinessCard } from "@/components/business/BusinessCard";
+import { BusinessCardSkeleton } from "@/components/ui/Skeleton";
 import { NewBusinessForm } from "@/components/business/NewBusinessForm";
 import type { BusinessDTO } from "@/types/business";
 
@@ -49,6 +52,7 @@ export function NewBusinessPage() {
     (location.state as { fromRegister?: boolean } | null)?.fromRegister === true;
   const [open, setOpen] = useState(fromRegister);
   const [created, setCreated] = useState<BusinessDTO | null>(null);
+  const { data: myBusinesses = [], isLoading: myBusinessesLoading } = useMyBusinesses();
 
   useEffect(() => {
     if (!open) return;
@@ -120,7 +124,7 @@ export function NewBusinessPage() {
           </Button>
         </div>
 
-        {created ? (
+        {created && (
           <div className="mt-8 rounded-3xl border border-verde/25 bg-verde-tint p-8 text-center">
             <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-verde text-white">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -145,14 +149,31 @@ export function NewBusinessPage() {
               </Button>
             </div>
           </div>
-        ) : (
-          <div className="mt-8">
-            <EmptyState
-              title="Aún no has publicado nada"
-              description="Pulsa “Publicar negocio” y llena el formulario para que aparezcas en La Frontera."
-            />
-          </div>
         )}
+
+        <div className="mt-8">
+          <h2 className="font-display text-lg font-bold text-ink">Mis negocios</h2>
+          <div className="mt-4">
+            {myBusinessesLoading ? (
+              <div className="grid grid-cols-2 gap-5 sm:grid-cols-3">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <BusinessCardSkeleton key={i} />
+                ))}
+              </div>
+            ) : myBusinesses.length > 0 ? (
+              <div className="grid grid-cols-2 gap-5 sm:grid-cols-3">
+                {myBusinesses.map((business) => (
+                  <BusinessCard key={business.id} business={business} />
+                ))}
+              </div>
+            ) : (
+              <EmptyState
+                title="Aún no has publicado nada"
+                description="Pulsa “Publicar negocio” y llena el formulario para que aparezcas en La Frontera."
+              />
+            )}
+          </div>
+        </div>
       </div>
 
       <AnimatePresence>

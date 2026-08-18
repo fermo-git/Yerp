@@ -21,3 +21,12 @@ export const CATEGORY_ICONS: Record<BusinessCategory, ReactNode> = {
   EDUCACION: icon(<path d="M2 8l10-4 10 4-10 4L2 8zM6 10.5V15c0 1.5 3 3 6 3s6-1.5 6-3v-4.5M22 8v6" />),
   OTRO: icon(<><circle cx="5" cy="12" r="1.4" /><circle cx="12" cy="12" r="1.4" /><circle cx="19" cy="12" r="1.4" /></>),
 };
+
+export const ALL_CATEGORIES_ICON = icon(
+  <>
+    <rect x="3" y="3" width="7" height="7" rx="1" />
+    <rect x="14" y="3" width="7" height="7" rx="1" />
+    <rect x="3" y="14" width="7" height="7" rx="1" />
+    <rect x="14" y="14" width="7" height="7" rx="1" />
+  </>
+);

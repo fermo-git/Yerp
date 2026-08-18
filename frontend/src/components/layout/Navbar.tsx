@@ -60,6 +60,16 @@ const NAV_LINKS = [
     to: "/negocios/nuevo",
     icon: icon(<path d="M4 8h16v12H4zM9 8V5a3 3 0 0 1 6 0v3M4 13h16" />),
   },
+  {
+    label: "Admin",
+    to: "/admin",
+    icon: icon(
+      <>
+        <circle cx="12" cy="12" r="3" />
+        <path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1" />
+      </>
+    ),
+  },
 ];
 
 export function Navbar() {
@@ -67,10 +77,14 @@ export function Navbar() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
 
-  const links =
-    user?.role === "BUSINESS_OWNER"
-      ? NAV_LINKS
-      : NAV_LINKS.filter((link) => link.to !== "/negocios/nuevo");
+  const links = NAV_LINKS.filter(
+    (link) =>
+      link.to === "/admin"
+        ? user?.role === "ADMIN"
+        : link.to === "/negocios/nuevo"
+          ? user?.role === "BUSINESS_OWNER"
+          : true
+  );
 
   return (
     <header className="sticky top-0 z-50 border-b border-ink/10 bg-paper">
@@ -101,13 +115,21 @@ export function Navbar() {
           <div className="hidden items-center gap-1.5 md:flex">
             {user ? (
               <>
-                <span className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-verde-tint text-sm font-bold text-verde-deep">
+                <button
+                  onClick={() => {
+                    setOpen(false);
+                    navigate("/perfil");
+                  }}
+                  aria-label="Ir a mi perfil"
+                  title="Mi perfil"
+                  className="flex h-9 w-9 cursor-pointer items-center justify-center overflow-hidden rounded-full bg-verde-tint text-sm font-bold text-verde-deep transition-opacity hover:opacity-80"
+                >
                   {user.avatarUrl ? (
                     <img src={user.avatarUrl} alt={user.name} className="h-full w-full object-cover" />
                   ) : (
                     user.name.charAt(0).toUpperCase()
                   )}
-                </span>
+                </button>
                 <Button variant="outline" size="sm" onClick={logout}>
                   Salir
                 </Button>
@@ -153,9 +175,22 @@ export function Navbar() {
             ))}
             <div className="mt-2 flex gap-2 px-3">
               {user ? (
-                <Button variant="outline" size="sm" className="flex-1" onClick={logout}>
-                  Salir
-                </Button>
+                <>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => {
+                      setOpen(false);
+                      navigate("/perfil");
+                    }}
+                  >
+                    Mi perfil
+                  </Button>
+                  <Button variant="outline" size="sm" className="flex-1" onClick={logout}>
+                    Salir
+                  </Button>
+                </>
               ) : (
                 <>
                   <Button

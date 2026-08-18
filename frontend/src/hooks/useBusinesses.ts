@@ -10,6 +10,7 @@ import {
   getFeaturedBusinesses,
   getBusinesses,
   getBusinessBySlug,
+  getMyBusinesses,
   getRecentActivity,
   getBorderWidgets,
   createBusiness,
@@ -45,6 +46,15 @@ export function useBusinessBySlug(slug: string) {
     queryKey: ["businesses", "detail", slug],
     queryFn: () => getBusinessBySlug(slug),
     enabled: Boolean(slug),
+  });
+}
+
+export function useMyBusinesses() {
+  const { status, user } = useAuth();
+  return useQuery({
+    queryKey: ["businesses", "mine"],
+    queryFn: getMyBusinesses,
+    enabled: status === "authenticated" && user?.role === "BUSINESS_OWNER",
   });
 }
 

@@ -5,6 +5,7 @@ import {
   useMyMarketplaceListings,
   useUpdateMarketplaceListing,
   useUpdateMarketplaceListingStatus,
+  useUploadMarketplaceImage,
 } from "@/hooks/useMarketplace";
 import { MyListingCard } from "@/components/marketplace/MyListingCard";
 import { CreateListingModal } from "@/components/marketplace/CreateListingModal";
@@ -26,17 +27,28 @@ export function MyMarketplaceListingsPage() {
   const { data: listings, isLoading, isError } = useMyMarketplaceListings();
   const updateStatus = useUpdateMarketplaceListingStatus();
   const updateListing = useUpdateMarketplaceListing();
+  const uploadImage = useUploadMarketplaceImage();
 
   const [editingListing, setEditingListing] = useState<MarketplaceListing | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   function handleMarkSold(id: string) {
     updateStatus.mutate({ id, status: "SOLD" });
   }
 
-  async function handleEditSubmit(input: CreateListingInput) {
+  async function handleEditSubmit(input: CreateListingInput, imageFile: File | null) {
     if (!editingListing) return;
-    await updateListing.mutateAsync({ id: editingListing.id, input });
-    setEditingListing(null);
+    setSubmitError(null);
+    try {
+      let imageUrl = editingListing.imageUrl;
+      if (imageFile) imageUrl = await uploadImage.mutateAsync(imageFile);
+      await updateListing.mutateAsync({ id: editingListing.id, input: { ...input, imageUrl } });
+      setEditingListing(null);
+    } catch (err) {
+      setSubmitError(
+        err instanceof Error ? err.message : "No se pudo guardar. Intenta de nuevo."
+      );
+    }
   }
 
   return (
@@ -102,9 +114,13 @@ export function MyMarketplaceListingsPage() {
       <CreateListingModal
         open={Boolean(editingListing)}
         mode="edit"
-        onClose={() => setEditingListing(null)}
+        onClose={() => {
+          setEditingListing(null);
+          setSubmitError(null);
+        }}
         onSubmit={handleEditSubmit}
-        isSubmitting={updateListing.isPending}
+        isSubmitting={updateListing.isPending || uploadImage.isPending}
+        error={submitError}
         initialValues={
           editingListing
             ? {

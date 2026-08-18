@@ -1,4 +1,5 @@
 services:
+  # --- Base de datos (NO modificar) ---
   db:
     image: postgres:16-alpine
     container_name: lafrontera-db
@@ -12,5 +13,54 @@ services:
     volumes:
       - lafrontera_pgdata:/var/lib/postgresql/data
 
+  # --- API (Express + Prisma) ---
+  api:
+    build: ./backend
+    container_name: lafrontera-api
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    environment:
+      # Dentro de la red de compose la BD es el servicio `db` (puerto interno 5432).
+      # El resto de variables (JWT_SECRET, OPENWEATHER_API_KEY, ...) se leen de backend/.env.
+      DATABASE_URL: postgresql://lafrontera:lafrontera@db:5432/lafrontera?schema=public
+      PORT: "4000"
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:8080}
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-http://localhost:4000}
+    ports:
+      - "${API_PORT:-4000}:4000"
+    volumes:
+      # Las imágenes/menús subidos viven fuera del filesystem del contenedor.
+      - uploads_data:/app/uploads
+    depends_on:
+      - db
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:4000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  # --- Frontend (build estático servido por nginx) ---
+  web:
+    build:
+      context: ./frontend
+      args:
+        # URL pública de la API que el navegador usará (se incrusta en el bundle).
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:4000/api/v1}
+    container_name: lafrontera-web
+    restart: unless-stopped
+    ports:
+      - "${WEB_PORT:-8080}:80"
+    depends_on:
+      - api
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
 volumes:
   lafrontera_pgdata:
+  uploads_data:

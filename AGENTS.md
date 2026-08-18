@@ -12,6 +12,7 @@
 ## Database & backend
 
 - PostgreSQL vía Docker: `docker compose up -d` (puerto `5433`, base `lafrontera`). Credenciales en `backend/.env`.
+- Producción con Docker: `docker compose up -d --build` levanta 3 servicios — `db` (PostgreSQL, NO modificar), `api` (`backend/Dockerfile`, node:20-bullseye-slim, corre `prisma migrate deploy` + reintentos al arrancar vía `docker-entrypoint.sh`) y `web` (`frontend/Dockerfile`, build multi-etapa + nginx con SPA fallback y caché de assets). Variables de puertos/URLs en `.env` raíz (ver `.env.example`); secretos del backend en `backend/.env`. Los uploads persisten en el volumen `uploads_data`.
 - Instalar backend: `npm install` desde `backend/`.
 - Migrar/generar: `npm run prisma:generate` y `npm run prisma:migrate` desde `backend/` (apuntan a `backend/prisma/schema.prisma`).
 - Sembrar: `npm run prisma:seed` desde `backend/` (restaurantes + horarios + galería + reseñas; dueño demo `owner@lafrontera.mx` / `demo1234`).
@@ -97,3 +98,77 @@ Funcionalidad: desde la pestaña "Negocios" (`/negocios/nuevo`, antes placeholde
 ### Notas
 - Las imágenes y el menú se sirven en `http://localhost:4000/uploads/<uuid>.<ext>` (`express.static`); en producción conviene un bucket/CDN. `PUBLIC_BASE_URL` (en `backend/.env`) controla la base de las URLs; `helmet` se configura con `crossOriginResourcePolicy: cross-origin` para permitir cargarlas desde el frontend (5173).
 - El `slug` lo genera el backend (`lib/slug.js`, sin acentos + sufijo aleatorio si colisiona); `status` por defecto `ACTIVE`; `featured`, `avgRating`, `reviewCount` y `ownerId` nunca los manda el cliente (`ownerId` sale de `req.userId`).
+
+## Marketplace — Subida de imagen de publicación
+
+El formulario de marketplace (`CreateListingModal`) permite subir una foto del artículo desde el dispositivo (drag & drop o selector de archivos) en lugar de pegar una URL.
+
+### Flujo
+- `POST /marketplace/images` (auth + rate limit 30/15min, Multer `single("image")`) valida magic bytes + sharp, guarda con UUID en `uploads/`, devuelve `{ url }`. No escribe en BD.
+- El cliente sube la imagen primero (`uploadMarketplaceImage` → `useUploadMarketplaceImage`), luego crea/edita la publicación con la URL devuelta en `imageUrl`. Si la subida falla, el modal permanece abierto con banner de error y el usuario puede reintentar sin duplicar la publicación.
+- En modo edición, el modal muestra la imagen actual como preview; si el usuario sube una nueva, reemplaza `imageUrl` en el PATCH.
+- `ListingImageField` (`components/marketplace/ListingImageField.tsx`) es el componente de subida (1 imagen, validación de tipo en cliente, preview, botón quitar).
+
+### Archivos
+- Backend modificados: `backend/routes/marketplace.routes.js` (endpoint `POST /images`, rate limiter, imports de `lib/upload.js`).
+- Frontend nuevos: `frontend/src/components/marketplace/ListingImageField.tsx`.
+- Frontend modificados: `frontend/src/components/marketplace/CreateListingModal.tsx` (uploader + banner de error + nueva firma `onSubmit(input, imageFile)`), `frontend/src/pages/MarketplacePage.tsx` (orquestación upload → create), `frontend/src/pages/MyMarketplaceListingsPage.tsx` (orquestación upload → patch), `frontend/src/services/api/marketplace.ts` (`uploadMarketplaceImage`), `frontend/src/hooks/useMarketplace.ts` (`useUploadMarketplaceImage`).
+
+## Perfil de usuario (`/perfil`)
+
+Página de perfil donde el usuario edita su información personal y puede convertir su cuenta en dueño de negocio.
+
+### Edición de información personal
+- Formulario con `name`, `phone` y `city` (select de `CITY_OPTIONS`) → `PATCH /users/me` (endpoint ya existente). `phone` acepta `null` para limpiarse (`UpdateMeInput` refleja eso). `email`, `role`, `interests`, `isActive` y `createdAt` son solo lectura en la UI.
+- Foto de perfil: subida de archivo (JPG/PNG/WebP) en lugar de URL. `POST /users/me/avatar` (en `backend/routes/users.routes.js`, auth + rate limit 30/15min, Multer `single("avatar")`, magic bytes + sharp, UUID en `uploads/`) devuelve `{ url }` sin escribir en BD; la página persiste la URL con `updateMe({ avatarUrl: url })`, lo que actualiza el `user` en contexto (y el avatar del Navbar al instante). El círculo del avatar pulsa mientras sube; errores con `role="alert"`.
+- Guardado con `updateMe` del `AuthContext` (actualiza el `user` en contexto). Banners: éxito verde-tint, error `alto` con `role="alert"`.
+
+### Conversión a BUSINESS_OWNER
+- `POST /users/me/upgrade-to-owner` (en `backend/routes/users.routes.js`): endpoint de un solo propósito, SIN body (no hay mass assignment) y nunca permite `ADMIN`. `USER` → `BUSINESS_OWNER`; si ya es dueño responde el usuario sin cambios (idempotente); `ADMIN` recibe 403.
+- Frontend: `upgradeToOwner` en `services/api/auth.ts` + método homónimo en `AuthContext` (actualiza `user.role`). Al actualizarse el rol, el `Navbar` muestra "Publica tu negocio" automáticamente (ya está condicionado a `role === "BUSINESS_OWNER"`).
+- UX: botón "Convertirme en dueño de negocio" en la card lateral abre un modal (`role="dialog"`) con 3 estados — `pending` (espera con pulso), `success` (check + botón "Publicar mi negocio" → `/negocios/nuevo`) y `error` (reintentar/cerrar). El modal no se cierra con clic fuera mientras está en `pending`.
+
+### Archivos
+- Backend modificados: `backend/routes/users.routes.js` (endpoints `POST /me/upgrade-to-owner` y `POST /me/avatar`).
+- Frontend nuevos: `frontend/src/pages/ProfilePage.tsx`.
+- Frontend modificados: `frontend/src/App.tsx` (ruta `/perfil`), `frontend/src/services/api/auth.ts` (`upgradeToOwner`, `uploadAvatarImage`), `frontend/src/context/AuthContext.tsx` (`upgradeToOwner` en el contexto), `frontend/src/components/layout/Navbar.tsx` (avatar → `/perfil` con `cursor-pointer` en desktop, botón "Mi perfil" en menú móvil), `frontend/src/types/user.ts` (`UpdateMeInput.phone/avatarUrl` aceptan `null`).
+
+## Favoritos de negocios
+
+Favoritos persistentes por usuario, guardados en la tabla `favorites` (userId + businessId, par único). Antes vivían en `useState` local y se perdían al refrescar; ahora se sincronizan con el perfil.
+
+### Backend (`backend/routes/users.routes.js`, todos bajo `authRequired`)
+- `GET /users/me/favorites` — lista los negocios favoritos del usuario (galería + horarios incluidos, serializados con `serializeBusiness`), ordenados por fecha desc.
+- `PUT /users/me/favorites/:businessId` — agrega favorito con `upsert` (idempotente); 404 si el negocio no existe.
+- `DELETE /users/me/favorites/:businessId` — quita favorito con `deleteMany` (idempotente). Sin rate limit (consistente con reseñas). No requiere migraciones (la tabla ya existe).
+
+### Frontend
+- `services/api/favorites.ts`: `getMyFavorites()` (normaliza con `toBusiness`), `addFavorite(businessId)`, `removeFavorite(businessId)`.
+- `hooks/useFavorites.ts`: `useFavorites()` (query `["favorites","mine"]`, solo habilitada autenticado) y `useToggleFavorite()` (mutation con optimistic update + rollback en error + invalidación al terminar).
+- `RestaurantsPage` y `RestaurantDetailPage` leen el estado real de favoritos (Set de slugs derivado con `useMemo`); sin sesión el toggle redirige a `/login`. El filtro "Solo favoritos" sigue siendo client-side sobre la lista cargada.
+- `ProfilePage` muestra la sección "Tus favoritos" (eyebrow "Guardados"): skeletons, `EmptyState` con CTA a `/explorar` y grid de `BusinessCard` (2/3/4 cols).
+- El estado "es favorito" NO viaja en los endpoints públicos de negocios: se fusiona en el cliente con la query de favoritos.
+
+## Panel de administración (`/admin`)
+
+Sección separada solo para rol `ADMIN`. Sin Navbar/Footer públicos: `layouts/AdminLayout.tsx` con sidebar propio (Dashboard / Negocios / Reseñas / Usuarios). Ruta protegida por `components/admin/AdminRoute.tsx` (sin sesión → `/login`; rol ≠ `ADMIN` → aviso sin permisos; carga → spinner).
+
+### Backend (`backend/routes/admin.routes.js`, montado en `/api/v1/admin`)
+- Todas bajo `authRequired` + `requireRole("ADMIN")`.
+- `GET /admin/stats` — KPIs (usuarios, negocios por estado, reseñas, marketplace) + últimos 5 negocios, reseñas y usuarios.
+- `GET /admin/businesses` — todos los negocios (incluye archivados) con filtros `city`, `category`, `status`, `q` y dueño embebido.
+- `PATCH /admin/businesses/:id` — solo `status` (`ACTIVE`/`ARCHIVED`) y/o `featured` (whitelist, sin edición libre).
+- `DELETE /admin/businesses/:id` — elimina el negocio (cascade a reseñas/galería/horarios/favoritos).
+- `GET /admin/reviews` — reseñas con filtros `q` (autor/negocio/comentario) y `rating`, tope 100.
+- `DELETE /admin/reviews/:id` — elimina la reseña y recalcula `avgRating`/`reviewCount` del negocio.
+- `GET /admin/users` — usuarios con filtros `q`, `role`, `city`, tope 100, con nº de negocios.
+- `PATCH /admin/users/:id` — cambiar `role` (`USER`/`BUSINESS_OWNER`, whitelist estricta, **nunca ADMIN**; rechaza si el objetivo es `ADMIN`) y/o `isActive`.
+- Ajuste: `GET /businesses/:slug` ahora solo devuelve negocios `status: "ACTIVE"` (un archivado desaparece de la vista pública).
+
+### Frontend
+- `services/api/admin.ts` (tipos + métodos), `hooks/useAdmin.ts` (queries con `placeholderData` + mutations que invalidan por sección).
+- Páginas en `pages/admin/`: `AdminDashboardPage` (StatCards + actividad reciente), `AdminBusinessesPage` (filtros + destacar/archivar/eliminar), `AdminReviewsPage` (filtros + eliminar), `AdminUsersPage` (cambiar rol/activar-desactivar; protege cuenta propia y admins).
+- Componentes en `components/admin/`: `StatCard` (valores en Plex Mono tabular, `alert` para ámbar), `ConfirmDialog`, `AdminRoute`, `AdminPageHeader` (eyebrow + título + descripción + `RouteLine`, usado por las 4 páginas).
+- `AdminLayout`: sidebar blanco con wordmark (`Wordmark`), iconos de navegación, tarjeta del usuario (avatar + badge "Admin") y acciones "Ver sitio"/"Cerrar sesión"; activo = `bg-verde-tint`. El dashboard muestra 3 listados de actividad reciente (negocios, reseñas, usuarios recientes).
+- `Navbar`: link "Admin" solo visible con `role === "ADMIN"` (desktop y móvil).
+- Roles `ADMIN` no se asignan desde el cliente: se configuran directamente en BD.

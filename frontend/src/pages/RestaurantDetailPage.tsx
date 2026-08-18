@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useRestaurantBySlug } from "@/hooks/useRestaurants";
 import { useCreateReview, useReviews } from "@/hooks/useReviews";
+import { useFavorites, useToggleFavorite } from "@/hooks/useFavorites";
 import { RestaurantHero } from "@/components/business/RestaurantHero";
 import { HoursTable } from "@/components/business/HoursTable";
 import { ContactCard } from "@/components/business/ContactCard";
@@ -64,16 +65,22 @@ export function RestaurantDetailPage() {
   const { data: restaurant, isLoading, isError } = useRestaurantBySlug(slug ?? "");
   const { data: reviews, isLoading: reviewsLoading } = useReviews(restaurant?.id ?? "");
   const createReview = useCreateReview();
-  const [isFavorite, setIsFavorite] = useState(false);
+  const { data: myFavorites } = useFavorites();
+  const toggleFavoriteMutation = useToggleFavorite();
   const [selectedStar, setSelectedStar] = useState<number | null>(null);
   const [reviewSort, setReviewSort] = useState<ReviewSort>("RECIENTES");
+
+  const isFavorite = Boolean(
+    restaurant && myFavorites?.some((f) => f.id === restaurant.id)
+  );
 
   const toggleFavorite = () => {
     if (!user) {
       navigate("/login");
       return;
     }
-    setIsFavorite((v) => !v);
+    if (!restaurant) return;
+    toggleFavoriteMutation.mutate({ business: restaurant, favorite: !isFavorite });
   };
 
   const scrollToReviews = () => {
@@ -146,10 +153,12 @@ export function RestaurantDetailPage() {
             <Eyebrow>Menú</Eyebrow>
             <h2 className="mt-2 font-display text-xl font-bold text-ink">Menú</h2>
             <div className="mt-4">
-              {restaurant.website ? (
+              {restaurant.menuUrl || restaurant.website ? (
                 <Button
                   variant="outline"
-                  onClick={() => window.open(restaurant.website, "_blank", "noopener,noreferrer")}
+                  onClick={() =>
+                    window.open(restaurant.menuUrl ?? restaurant.website, "_blank", "noopener,noreferrer")
+                  }
                 >
                   Ver menú
                   <svg

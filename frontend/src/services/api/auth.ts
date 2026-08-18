@@ -50,6 +50,23 @@ export async function updateMe(input: UpdateMeInput): Promise<User | null> {
   return user;
 }
 
+/** Promueve USER → BUSINESS_OWNER. El backend nunca permite ADMIN desde aquí. */
+export async function upgradeToOwner(): Promise<User | null> {
+  const { user } = await apiClient.post<{ user: User }>("/users/me/upgrade-to-owner", {});
+  return user;
+}
+
+/**
+ * Sube la foto de perfil (multipart, campo "avatar") y devuelve la URL pública.
+ * La URL se persiste después con updateMe({ avatarUrl: url }).
+ */
+export async function uploadAvatarImage(file: File): Promise<string> {
+  const form = new FormData();
+  form.append("avatar", file, file.name);
+  const { url } = await apiClient.upload<{ url: string }>("/users/me/avatar", form);
+  return url;
+}
+
 export async function setMyInterests(
   categories: BusinessCategory[]
 ): Promise<BusinessCategory[]> {

@@ -1,7 +1,8 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useRestaurants, useRestaurantFilters } from "@/hooks/useRestaurants";
+import { useFavorites, useToggleFavorite } from "@/hooks/useFavorites";
 import { SearchBar } from "@/components/search/SearchBar";
 import { RestaurantFilterBar } from "@/components/business/RestaurantFilterBar";
 import { RestaurantGrid } from "@/components/business/RestaurantGrid";
@@ -14,26 +15,29 @@ export function RestaurantsPage() {
   const navigate = useNavigate();
   const { filters, setParam } = useRestaurantFilters();
   const { data, isLoading, isError } = useRestaurants(filters);
-  const [favorites, setFavorites] = useState<Set<string>>(() => new Set());
+  const { data: myFavorites } = useFavorites();
+  const toggleFavoriteMutation = useToggleFavorite();
+
+  const favoriteSlugs = useMemo(
+    () => new Set((myFavorites ?? []).map((f) => f.slug)),
+    [myFavorites]
+  );
 
   const toggleFavorite = (slug: string) => {
     if (!user) {
       navigate("/login");
       return;
     }
-    setFavorites((prev) => {
-      const next = new Set(prev);
-      if (next.has(slug)) next.delete(slug);
-      else next.add(slug);
-      return next;
-    });
+    const business = data?.find((b) => b.slug === slug);
+    if (!business) return;
+    toggleFavoriteMutation.mutate({ business, favorite: !favoriteSlugs.has(slug) });
   };
 
   const displayed = useMemo(() => {
     let list = data ?? [];
-    if (filters.favorites) list = list.filter((r) => favorites.has(r.slug));
+    if (filters.favorites) list = list.filter((r) => favoriteSlugs.has(r.slug));
     return list;
-  }, [data, filters.favorites, favorites]);
+  }, [data, filters.favorites, favoriteSlugs]);
 
   const countLabel =
     displayed.length === 1
@@ -65,10 +69,13 @@ export function RestaurantsPage() {
       <div className="mt-8">
         <SearchBar
           variant="compact"
-          showCity={false}
           city={filters.city ?? "TIJUANA"}
+          onCityChange={(city: BorderCity) => setParam("ciudad", city)}
           initialQuery={filters.q}
-          onSubmit={(q) => setParam("q", q || null)}
+          onSubmit={(q, city) => {
+            setParam("q", q || null);
+            setParam("ciudad", city);
+          }}
         />
       </div>
 
@@ -76,7 +83,6 @@ export function RestaurantsPage() {
         <RestaurantFilterBar
           filters={filters}
           isAuthenticated={Boolean(user)}
-          onCityChange={(city: BorderCity) => setParam("ciudad", city)}
           onRatingChange={(rating) => setParam("rating", rating == null ? null : String(rating))}
           onPriceToggle={(price: PriceRange) => {
             const current = filters.price;
@@ -97,7 +103,7 @@ export function RestaurantsPage() {
           restaurants={displayed}
           isLoading={isLoading}
           isError={isError}
-          favoriteSlugs={favorites}
+          favoriteSlugs={favoriteSlugs}
           onToggleFavorite={toggleFavorite}
         />
       </div>
