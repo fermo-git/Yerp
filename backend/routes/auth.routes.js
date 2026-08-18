@@ -13,6 +13,9 @@ const registerSchema = z.object({
   password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres"),
   phone: z.string().optional(),
   city: z.string().min(2, "Elige tu ciudad"),
+  // Whitelist estricta: el cliente solo puede elegir USER o BUSINESS_OWNER.
+  // ADMIN jamás se asigna desde el registro (zod lo rechaza con 400).
+  role: z.enum(["USER", "BUSINESS_OWNER"]).optional(),
 });
 
 router.post("/register", async (req, res, next) => {
@@ -32,6 +35,7 @@ router.post("/register", async (req, res, next) => {
         name: input.name,
         phone: input.phone || null,
         city: input.city,
+        role: input.role ?? "USER",
       },
     });
     const accessToken = signToken(user.id);

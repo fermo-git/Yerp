@@ -1,8 +1,15 @@
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/Button";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { Biznaga } from "@/components/brand/Cactus";
 
 export function PromoBanner() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  if (user?.role !== "BUSINESS_OWNER") return null;
+
   return (
     <section className="container-frontera py-16">
       <div className="grid overflow-hidden rounded-xl border border-ink/10 bg-white lg:grid-cols-2">
@@ -25,7 +32,7 @@ export function PromoBanner() {
             a tu ciudad.
           </p>
           <div className="mt-2">
-            <Button variant="primary" size="lg">
+            <Button variant="primary" size="lg" onClick={() => navigate("/negocios/nuevo")}>
               Publica tu negocio
             </Button>
           </div>

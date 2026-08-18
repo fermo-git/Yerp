@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { MainLayout } from "@/layouts/MainLayout";
 import { LandingPage } from "@/pages/LandingPage";
+import { ExplorePage } from "@/pages/ExplorePage";
 import { PlaceholderPage } from "@/pages/PlaceholderPage";
 import { LoginPage } from "@/pages/LoginPage";
 import { RegisterPage } from "@/pages/RegisterPage";
@@ -18,7 +19,7 @@ export default function App() {
       <Routes>
         <Route element={<MainLayout />}>
           <Route path="/" element={<LandingPage />} />
-          <Route path="/explorar" element={<PlaceholderPage title="Explorar negocios" />} />
+          <Route path="/explorar" element={<ExplorePage />} />
           <Route path="/eventos" element={<PlaceholderPage title="Eventos" />} />
           <Route path="/marketplace" element={<MarketplacePage />} />
           <Route path="/marketplace/mias" element={<MyMarketplaceListingsPage />} />

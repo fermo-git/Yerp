@@ -45,6 +45,19 @@ export interface RestaurantFilters {
   sort: RestaurantSort;
 }
 
+export type BusinessSort = RestaurantSort;
+
+export interface BusinessQueryParams {
+  city?: BorderCity;
+  category?: BusinessCategory;
+  q?: string;
+  minRating?: number;
+  priceRange?: PriceRange[];
+  sort?: BusinessSort;
+  featured?: boolean;
+  limit?: number;
+}
+
 export interface Business {
   id: string;
   slug: string;

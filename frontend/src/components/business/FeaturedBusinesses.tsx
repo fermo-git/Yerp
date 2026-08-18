@@ -1,20 +1,28 @@
 import { Link } from "react-router-dom";
 import { useFeaturedBusinesses } from "@/hooks/useBusinesses";
+import { useAuth } from "@/hooks/useAuth";
 import { BusinessCard } from "@/components/business/BusinessCard";
 import { BusinessCardSkeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Eyebrow } from "@/components/ui/Eyebrow";
+import { CITY_LABELS } from "@/types/business";
 
 export function FeaturedBusinesses() {
-  const { data, isLoading, isError } = useFeaturedBusinesses();
+  const { user } = useAuth();
+  const city = user?.city;
+  const { data, isLoading, isError } = useFeaturedBusinesses(city);
+
+  const heading = city
+    ? `Lo mejor de ${CITY_LABELS[city]}`
+    : "Lo mejor de tu lado de la línea";
 
   return (
-    <section className="container-frontera py-16">
+    <section className="container-frontera py-20">
       <header className="flex items-end justify-between gap-4">
         <div>
           <Eyebrow>Destacados de la semana</Eyebrow>
           <h2 className="mt-2 font-display text-3xl font-bold tracking-tight text-ink sm:text-4xl">
-            Lo mejor de tu lado de la línea
+            {heading}
           </h2>
         </div>
         <Link

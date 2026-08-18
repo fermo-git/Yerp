@@ -9,6 +9,7 @@ import { ImageUploader } from "@/components/business/ImageUploader";
 import { MapPicker, type LatLng } from "@/components/business/MapPicker";
 import { useCreateBusiness, useUploadGallery, useUploadMenu } from "@/hooks/useBusinesses";
 import { cn } from "@/utils/cn";
+import { readBusinessDraft, clearBusinessDraft } from "@/lib/businessDraft";
 import {
   BORDER_CITIES,
   BUSINESS_CATEGORIES,
@@ -140,6 +141,15 @@ const categoryOptions = BUSINESS_CATEGORIES.map((value) => ({
   label: CATEGORY_LABELS[value],
 }));
 
+function readDraftDefaults() {
+  const draft = readBusinessDraft();
+  return {
+    name: draft?.name ?? "",
+    description: draft?.description ?? "",
+    category: draft?.category ?? (undefined as BusinessCategory | undefined),
+  };
+}
+
 export function NewBusinessForm({
   onComplete,
   onCancel,
@@ -165,6 +175,7 @@ export function NewBusinessForm({
 
   const [menuFile, setMenuFile] = useState<File | null>(null);
   const menuInputRef = useRef<HTMLInputElement>(null);
+  const [draftDefaults] = useState(readDraftDefaults);
 
   const {
     register,
@@ -176,9 +187,9 @@ export function NewBusinessForm({
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
-      name: "",
-      description: "",
-      category: undefined,
+      name: draftDefaults.name,
+      description: draftDefaults.description,
+      category: draftDefaults.category,
       priceRange: undefined,
       city: undefined,
       address: "",
@@ -268,6 +279,7 @@ export function NewBusinessForm({
       }
 
       setSuccessMsg(null);
+      clearBusinessDraft();
       onComplete(business);
     } catch (err) {
       const msg = err instanceof Error ? err.message : "No se pudo publicar el negocio";

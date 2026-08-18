@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 import { Biznaga } from "@/components/brand/Cactus";
 import { Wordmark } from "@/components/brand/Wordmark";
+import { useAuth } from "@/hooks/useAuth";
+import { cn } from "@/utils/cn";
 import { CITY_LABELS, type BorderCity } from "@/types/business";
 
 const CITIES = Object.entries(CITY_LABELS) as [BorderCity, string][];
@@ -23,9 +25,18 @@ const COLUMNS: { title: string; links: { label: string; to: string }[] }[] = [
 ];
 
 export function Footer() {
+  const { user } = useAuth();
+  const isOwner = user?.role === "BUSINESS_OWNER";
+  const columns = isOwner ? COLUMNS : COLUMNS.filter((col) => col.title !== "Negocios");
+
   return (
     <footer className="border-t border-ink/10 bg-white">
-      <div className="container-frontera grid grid-cols-2 gap-10 py-14 md:grid-cols-4">
+      <div
+        className={cn(
+          "container-frontera grid grid-cols-2 gap-10 py-14",
+          isOwner ? "md:grid-cols-4" : "md:grid-cols-3"
+        )}
+      >
         <div className="col-span-2 flex flex-col gap-4 md:col-span-1">
           <Wordmark size="sm" />
           <p className="max-w-xs text-sm text-ink/60">
@@ -33,7 +44,7 @@ export function Footer() {
           </p>
         </div>
 
-        {COLUMNS.map((col) => (
+        {columns.map((col) => (
           <div key={col.title} className="flex flex-col gap-3">
             <h4 className="font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-ink/60">
               {col.title}
