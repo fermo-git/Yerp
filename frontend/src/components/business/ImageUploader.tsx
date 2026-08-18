@@ -2,34 +2,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { cn } from "@/utils/cn";
 
 const MAX_FILES = 10;
-const MAX_BYTES = 5 * 1024 * 1024;
 const ALLOWED = new Set(["image/jpeg", "image/png", "image/webp"]);
-const RATIO = 16 / 9;
-const RATIO_TOL = 0.01;
-const MIN_W = 1280;
-const MIN_H = 720;
 
 interface Preview {
   id: string;
   url: string;
-}
-
-function readDims(file: File): Promise<{ w: number; h: number }> {
-  return new Promise((resolve, reject) => {
-    const url = URL.createObjectURL(file);
-    const img = new Image();
-    img.onload = () => {
-      const w = img.naturalWidth;
-      const h = img.naturalHeight;
-      URL.revokeObjectURL(url);
-      resolve({ w, h });
-    };
-    img.onerror = () => {
-      URL.revokeObjectURL(url);
-      reject(new Error("Imagen no válida"));
-    };
-    img.src = url;
-  });
 }
 
 export function ImageUploader({
@@ -76,24 +53,7 @@ export function ImageUploader({
           errors.push(`${file.name}: formato no permitido (JPG, PNG o WebP)`);
           continue;
         }
-        if (file.size > MAX_BYTES) {
-          errors.push(`${file.name}: pesa más de 5 MB`);
-          continue;
-        }
-        try {
-          const { w, h } = await readDims(file);
-          if (w < MIN_W || h < MIN_H) {
-            errors.push(`${file.name}: mínimo ${MIN_W}×${MIN_H} px`);
-            continue;
-          }
-          if (Math.abs(w / h - RATIO) > RATIO_TOL) {
-            errors.push(`${file.name}: requiere formato 16:9`);
-            continue;
-          }
-          accepted.push(file);
-        } catch {
-          errors.push(`${file.name}: no se pudo leer`);
-        }
+        accepted.push(file);
       }
       if (accepted.length) onChange([...value, ...accepted]);
       const msgs = [...errors];
@@ -150,7 +110,7 @@ export function ImageUploader({
           Arrastra imágenes aquí o haz clic para seleccionar
         </p>
         <p className="text-xs text-ink-soft">
-          Hasta {MAX_FILES} · JPG/PNG/WebP · 16:9 · mínimo {MIN_W}×{MIN_H} · máx 5 MB
+          Hasta {MAX_FILES} · JPG/PNG/WebP
         </p>
       </div>
 
