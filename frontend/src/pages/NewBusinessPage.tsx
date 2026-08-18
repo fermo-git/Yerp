@@ -108,7 +108,7 @@ export function NewBusinessPage() {
             <p className="text-xs font-semibold uppercase tracking-wide text-verde-deep">Negocios</p>
             <h1 className="mt-1 font-display text-2xl font-bold text-ink sm:text-3xl">Publica tu negocio</h1>
             <p className="mt-2 max-w-xl text-sm text-ink-soft">
-              Completa los datos de tu negocio y sube hasta 10 imágenes en formato 16:9. Tu negocio aparecerá en
+              Completa los datos de tu negocio y sube hasta 10 imágenes. Tu negocio aparecerá en
               La Frontera al publicarlo.
             </p>
           </div>

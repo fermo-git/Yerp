@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -19,6 +19,7 @@ type FormValues = z.infer<typeof schema>;
 export function LoginPage() {
   const { status, login } = useAuth();
   const navigate = useNavigate();
+  const [rootError, setRootError] = useState<string | null>(null);
 
   useEffect(() => {
     if (status === "authenticated") navigate("/", { replace: true });
@@ -34,7 +35,12 @@ export function LoginPage() {
   });
 
   async function onSubmit(values: FormValues) {
-    await login(values);
+    setRootError(null);
+    try {
+      await login(values);
+    } catch (err) {
+      setRootError(err instanceof Error ? err.message : "No se pudo iniciar sesión");
+    }
   }
 
   return (
@@ -58,6 +64,15 @@ export function LoginPage() {
             Olvidé mi contraseña
           </Link>
         </div>
+
+        {rootError && (
+          <div
+            role="alert"
+            className="rounded-xl border border-amber/40 bg-amber-tint/50 px-4 py-3 text-sm text-amber-deep"
+          >
+            {rootError}
+          </div>
+        )}
 
         <Button type="submit" size="lg" className="mt-1 w-full" disabled={isSubmitting}>
           {isSubmitting ? "Entrando..." : "Iniciar sesión"}
