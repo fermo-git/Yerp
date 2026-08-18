@@ -223,6 +223,20 @@ router.post("/", createLimiter, authRequired, requireRole("BUSINESS_OWNER"), asy
   }
 });
 
+// GET /businesses/mine — negocios del dueño autenticado
+router.get("/mine", authRequired, async (req, res, next) => {
+  try {
+    const businesses = await prisma.business.findMany({
+      where: { ownerId: req.userId },
+      orderBy: { createdAt: "desc" },
+      include: { gallery: { orderBy: { order: "asc" } }, hours: true },
+    });
+    return res.json({ data: businesses.map(serializeBusiness) });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // GET /businesses/:slug — detalle
 router.get("/:slug", async (req, res, next) => {
   try {

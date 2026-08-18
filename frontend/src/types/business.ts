@@ -80,6 +80,7 @@ export interface Business {
   whatsapp?: string;
   email?: string;
   website?: string;
+  menuUrl?: string;
   openStatus?: {
     state: "OPEN" | "CLOSING_SOON" | "CLOSED";
     label: string;

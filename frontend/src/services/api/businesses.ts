@@ -53,6 +53,11 @@ export async function getBusinessBySlug(slug: string): Promise<Business> {
   return toBusiness(raw);
 }
 
+export async function getMyBusinesses(): Promise<Business[]> {
+  const raw = await apiClient.get<ApiBusiness[]>("/businesses/mine");
+  return raw.map(toBusiness);
+}
+
 export async function getRecentActivity(): Promise<RecentActivityItem[]> {
   await mockDelay();
   return MOCK_RECENT_ACTIVITY;

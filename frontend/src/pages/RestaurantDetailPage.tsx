@@ -146,10 +146,12 @@ export function RestaurantDetailPage() {
             <Eyebrow>Menú</Eyebrow>
             <h2 className="mt-2 font-display text-xl font-bold text-ink">Menú</h2>
             <div className="mt-4">
-              {restaurant.website ? (
+              {restaurant.menuUrl || restaurant.website ? (
                 <Button
                   variant="outline"
-                  onClick={() => window.open(restaurant.website, "_blank", "noopener,noreferrer")}
+                  onClick={() =>
+                    window.open(restaurant.menuUrl ?? restaurant.website, "_blank", "noopener,noreferrer")
+                  }
                 >
                   Ver menú
                   <svg

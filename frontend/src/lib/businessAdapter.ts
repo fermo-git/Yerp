@@ -56,6 +56,7 @@ export function toBusiness(raw: ApiBusiness): Business {
     whatsapp: raw.whatsapp ?? undefined,
     email: raw.email ?? undefined,
     website: raw.website ?? undefined,
+    menuUrl: raw.menuUrl ?? undefined,
     openStatus: raw.openStatus,
   };
 }
